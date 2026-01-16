@@ -3,6 +3,7 @@
 # Copyright (c) 2026 FanchMWRT
 
 . /lib/functions.sh
+. /lib/fwx/common.sh 2>/dev/null || true
 
 CONFIG="fwx_notify"
 LOG_FILE="/tmp/log/fwx-notify.log"

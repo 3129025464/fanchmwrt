@@ -4,6 +4,7 @@
 
 . /lib/functions.sh
 . /lib/fwx/nft_atomic.sh 2>/dev/null || true
+. /lib/fwx/common.sh 2>/dev/null || true
 
 # Constants
 readonly SURICATA_BIN="/usr/bin/suricata"

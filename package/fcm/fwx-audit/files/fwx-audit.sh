@@ -1,5 +1,6 @@
 #!/bin/sh
 . /lib/functions.sh
+. /lib/fwx/common.sh 2>/dev/null || true
 
 CONFIG="fwx_audit"
 LOG_DIR="/var/log/fwx"

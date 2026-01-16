@@ -1,6 +1,7 @@
 #!/bin/sh
 . /lib/functions.sh
 . /lib/functions/network.sh
+. /lib/fwx/common.sh 2>/dev/null || true
 
 CONFIG="fwx_ha"
 KEEPALIVED_CONF="/etc/keepalived/keepalived.conf"

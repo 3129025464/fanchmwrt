@@ -3,6 +3,7 @@
 # ClamAV integration for FanchMWRT
 
 . /lib/functions.sh
+. /lib/fwx/common.sh 2>/dev/null || true
 
 CLAMSCAN="/usr/bin/clamscan"
 CLAMDSCAN="/usr/bin/clamdscan"
