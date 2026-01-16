@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "fwx_config.h"
 #include "fwx.h"
+#include "fwx_common.h"
 #include <uci.h>
 
 app_name_info_t app_name_table[MAX_SUPPORT_APP_NUM];
@@ -34,7 +35,7 @@ void init_app_name_table(void)
     FILE *fp = fopen("/tmp/feature.cfg", "r");
     if (!fp)
     {
-        printf("open file failed\n");
+        LOG_ERROR("open feature.cfg failed");
         return;
     }
     g_app_count = 0;
@@ -68,7 +69,7 @@ void init_app_class_name_table(void)
     FILE *fp = fopen("/tmp/app_class.txt", "r");
     if (!fp)
     {
-        printf("open file failed\n");
+        LOG_ERROR("open app_class.txt failed");
         return;
     }
     g_cur_class_num = 0;

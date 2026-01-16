@@ -20,6 +20,7 @@
 #include "fwx.h"
 #include <stdio.h>
 #include "fwx_utils.h"
+#include "fwx_common.h"
 
 
 
@@ -54,7 +55,7 @@ int fwx_check_time_manual(fwx_time_config_t *t_config, fwx_run_time_status_t *st
                current_wday, t_config->time_list[i].weekday_map[current_wday]);
         
         if (current_minutes >= start_minutes && current_minutes <= end_minutes) {
-            LOG_DEBUG("current time in time list\n");
+            LOG_DEBUG("current time in time list");
             status->match_time = 1;
             return 1;
         }
@@ -70,11 +71,11 @@ int fwx_check_time_dynamic(fwx_time_config_t *t_config, fwx_run_time_status_t *s
 
     int start_minutes = t_config->seg_time.start_time.hour * 60 + t_config->seg_time.start_time.min;
     int end_minutes = t_config->seg_time.end_time.hour * 60 + t_config->seg_time.end_time.min;
-    printf("check seg_time: %02d:%02d-%02d:%02d\n", 
+    LOG_DEBUG("check seg_time: %02d:%02d-%02d:%02d", 
            t_config->seg_time.start_time.hour, t_config->seg_time.start_time.min,
            t_config->seg_time.end_time.hour, t_config->seg_time.end_time.min);
     if (!(current_minutes >= start_minutes && current_minutes <= end_minutes)) {
-        printf("current time not in seg_time\n");
+        LOG_DEBUG("current time not in seg_time");
         fwx_init_time_status(status);
         return 0; 
     }
@@ -85,17 +86,17 @@ int fwx_check_time_dynamic(fwx_time_config_t *t_config, fwx_run_time_status_t *s
         if (status->deny_time >= t_config->deny_time) {
             status->filter = 0;
             status->deny_time = 0;
-            printf("deny time over, filter = 0");
+            LOG_DEBUG("deny time over, filter = 0");
         }
-        printf("deny_time: %d\n", status->deny_time);
+        LOG_DEBUG("deny_time: %d", status->deny_time);
     } else {
         status->allow_time++;
         if (status->allow_time >= t_config->allow_time) {
             status->filter = 1;
             status->allow_time = 0;
-            printf("allow time over, filter = 1");
+            LOG_DEBUG("allow time over, filter = 1");
         }
-        printf("allow_time: %d\n", status->allow_time);
+        LOG_DEBUG("allow_time: %d", status->allow_time);
     }
     return status->filter;
 }
@@ -107,13 +108,13 @@ int fwx_check_time(fwx_time_config_t *t_config, fwx_run_time_status_t *status) {
     LOG_DEBUG("current day: %d\n", current_wday);
 
     if (t_config->time_mode == 0) {
-        LOG_DEBUG("manual mode\n");
+        LOG_DEBUG("manual mode");
         return fwx_check_time_manual(t_config, status);
     } else {
-        LOG_DEBUG("dynamic mode\n");
+        LOG_DEBUG("dynamic mode");
 
         if (t_config->seg_time.weekday_map[current_wday] == 0) {
-            LOG_DEBUG("current day not in configured days\n");
+            LOG_DEBUG("current day not in configured days");
             fwx_init_time_status(status);
             return 0;
         }

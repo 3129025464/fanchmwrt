@@ -21,6 +21,7 @@
 #include "fwx_utils.h"
 #include "fwx_app_filter.h"
 #include "check_main.h"
+#include "fwx_common.h"
 
 int current_log_level = LOG_LEVEL_WARN;
 #define CMD_GET_LAN_IP_FMT   "ifconfig %s | grep 'inet addr' | awk '{print $2}' | awk -F: '{print $2}'"
@@ -81,11 +82,11 @@ int fwx_load_feature_to_kernel(void){
 	FILE *fp = fopen("/tmp/feature.cfg", "r");
 	if (!fp)
 	{
-		LOG_ERROR("open file failed\n");
+		LOG_ERROR("open file failed");
 		return -1;
 	}
 	if (fwx_nl_clean_feature() < 0){
-        LOG_ERROR("Failed to clean feature\n");
+        LOG_ERROR("Failed to clean feature");
         return -1;
     }
 	while (fgets(line_buf, sizeof(line_buf), fp))
@@ -113,10 +114,10 @@ int reload_feature(void){
     init_app_name_table();
     init_app_class_name_table();
     if (fwx_load_feature_to_kernel() < 0){
-        LOG_ERROR("Failed to load feature to kernel\n");
+        LOG_ERROR("Failed to load feature to kernel");
         return -1;
     }
-    LOG_WARN("reload feature success\n");
+    LOG_WARN("reload feature success");
     return 0;
 }
 
@@ -176,12 +177,12 @@ void daily_archive_handle(void){
         LOG_INFO("current_mday: %d, last_mday: %d\n", current_mday, last_mday);
         
         if (last_mday != -1 && last_mday != current_mday) {
-            LOG_INFO("date changed, need to archive\n");
+            LOG_INFO("date changed, need to archive");
             
             check_and_archive_all_clients();
         }
         else{
-            LOG_INFO("date not changed, no need to archive\n");
+            LOG_INFO("date not changed, no need to archive");
         }
         
         last_mday = current_mday;
@@ -221,7 +222,7 @@ void fwx_timeout_handler(struct uloop_timeout *t)
             uloop_fd_add(&fwx_nl_fd, ULOOP_READ);
 
             system("killall -9 rule_manager");
-            LOG_INFO("netlink connect success\n");
+            LOG_INFO("netlink connect success");
         }
     }
 
@@ -254,7 +255,7 @@ void init_system_config_to_proc(void) {
 }
 
 void fwx_handle_sigusr1(int sig) {
-    LOG_INFO("Received SIGUSR1 signal\n");
+    LOG_INFO("Received SIGUSR1 signal");
     g_feature_update = 1;
 }
 
@@ -273,12 +274,12 @@ int main(int argc, char **argv)
 
     if (fwx_ubus_init() < 0)
     {
-        LOG_ERROR("Failed to connect to ubus\n");
+        LOG_ERROR("Failed to connect to ubus");
         return 1;
     }  
 
     if (start_check_thread() < 0) {
-        LOG_ERROR("Failed to start check_thread\n");
+        LOG_ERROR("Failed to start check_thread");
         return 1;
     }
 

@@ -23,13 +23,14 @@
 #include "fwx_config.h"
 #include "fwx_utils.h"
 #include "fwx_uci.h"
+#include "fwx_common.h"
 
 struct json_object *fwx_api_get_system_info(struct json_object *req_obj) {
     struct json_object *data_obj = json_object_new_object();
     struct json_object *fwx_obj = json_object_new_object();
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         json_object_put(fwx_obj);
         json_object_put(data_obj);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
@@ -42,8 +43,7 @@ struct json_object *fwx_api_get_system_info(struct json_object *req_obj) {
     }
     
     char theme_mode_str[8] = {0};
-    int theme_mode = 0; // 默认值为0（light）
-    ret = fwx_uci_get_value(uci_ctx, "fwx.global.theme_mode", theme_mode_str, sizeof(theme_mode_str) - 1);
+    int theme_mode = 0; // 默认值为0（light�?    ret = fwx_uci_get_value(uci_ctx, "fwx.global.theme_mode", theme_mode_str, sizeof(theme_mode_str) - 1);
     if (ret == 0) {
         theme_mode = atoi(theme_mode_str);
     }
@@ -63,45 +63,44 @@ struct json_object *fwx_api_set_system_info(struct json_object *req_obj) {
     
     struct json_object *fwx_obj = json_object_object_get(req_obj, "fwx");
     if (!fwx_obj) {
-        LOG_ERROR("Missing fwx parameter\n");
+        LOG_ERROR("Missing fwx parameter");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
     struct json_object *lan_ifname_obj = json_object_object_get(fwx_obj, "lan_ifname");
     if (!lan_ifname_obj) {
-        LOG_ERROR("Missing lan_ifname parameter\n");
+        LOG_ERROR("Missing lan_ifname parameter");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
     const char *lan_ifname = json_object_get_string(lan_ifname_obj);
     if (!lan_ifname || strlen(lan_ifname) == 0) {
-        LOG_ERROR("Invalid lan_ifname value\n");
+        LOG_ERROR("Invalid lan_ifname value");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
     if (strlen(lan_ifname) < 2 || strlen(lan_ifname) > 16) {
-        LOG_ERROR("lan_ifname length invalid\n");
+        LOG_ERROR("lan_ifname length invalid");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
     struct json_object *theme_mode_obj = json_object_object_get(fwx_obj, "theme_mode");
-    int theme_mode = 0; // 默认值为0（light）
-    if (theme_mode_obj) {
+    int theme_mode = 0; // 默认值为0（light�?    if (theme_mode_obj) {
         if (json_object_get_type(theme_mode_obj) == json_type_int) {
             theme_mode = json_object_get_int(theme_mode_obj);
         } else if (json_object_get_type(theme_mode_obj) == json_type_string) {
             theme_mode = atoi(json_object_get_string(theme_mode_obj));
         }
-        // 验证值只能是0或1
+        // 验证值只能是0�?
         if (theme_mode != 0 && theme_mode != 1) {
-            LOG_ERROR("Invalid theme_mode value, must be 0 or 1\n");
+            LOG_ERROR("Invalid theme_mode value, must be 0 or 1");
             return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
         }
     }
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     

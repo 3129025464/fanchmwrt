@@ -1,0 +1,55 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-section">
+    <h4><%:Manual Update%></h4>
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" onclick="updateThreatLists()"><%:Update Threat Lists Now%></button>
+    </div>
+    <div id="update-status"></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Statistics%></h4>
+    <div class="av-status">
+        <div class="av-status-item">
+            <div class="label"><%:IP Blacklist%></div>
+            <div class="value" id="stat-ips">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Domain Blacklist%></div>
+            <div class="value" id="stat-domains">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Last Update%></div>
+            <div class="value" id="stat-last-update">-</div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    
+    window.updateThreatLists = function() {
+        FWX.msg.show('update-status', '<%:Updating...%>');
+        FWX.api.post('threat_update', null, function(data) {
+            FWX.msg.show('update-status', data && data.success ? '<%:Update started in background%>' : '<%:Update failed%>', !data || !data.success);
+        });
+    };
+    
+    function loadStats() {
+        FWX.api.get('stats', function(data) {
+            if (!data) return;
+            FWX.dom.setText('stat-ips', FWX.format.number(data.threat_ips || 0));
+            FWX.dom.setText('stat-domains', FWX.format.number(data.threat_domains || 0));
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadStats);
+})();
+</script>
+
+<%+cbi/valuefooter%>

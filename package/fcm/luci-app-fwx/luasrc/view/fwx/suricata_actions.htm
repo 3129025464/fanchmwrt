@@ -1,0 +1,105 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-section">
+    <h4><%:Service Status%></h4>
+    <div class="av-status">
+        <div class="av-status-item">
+            <div class="label">Suricata</div>
+            <div class="value" id="suricata-status">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Rules Loaded%></div>
+            <div class="value" id="suricata-rules">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Alerts Today%></div>
+            <div class="value" id="suricata-alerts">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Memory Usage%></div>
+            <div class="value" id="suricata-memory">-</div>
+        </div>
+    </div>
+    
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" id="btn-toggle" onclick="toggleService()"><%:Start%></button>
+        <button class="cbi-button cbi-button-action" onclick="restartService()"><%:Restart%></button>
+        <button class="cbi-button cbi-button-action" onclick="reloadRules()"><%:Reload Rules%></button>
+    </div>
+    <div id="service-msg"></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Rule Management%></h4>
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" onclick="updateRules()"><%:Update Rules%></button>
+    </div>
+    <div id="rules-msg"></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Recent Alerts%></h4>
+    <div id="suricata-alert-list"><em><%:Loading...%></em></div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    var isRunning = false;
+    
+    function loadStatus() {
+        FWX.api.get('suricata_status', function(data) {
+            if (!data) return;
+            var btn = document.getElementById('btn-toggle');
+            
+            if (!data.installed) {
+                FWX.status.setValue('suricata-status', '<%:Not Installed%>', 'error');
+                btn.disabled = true;
+            } else {
+                isRunning = data.running;
+                FWX.status.setValue('suricata-status', isRunning ? '<%:Running%>' : '<%:Stopped%>', isRunning ? 'ok' : 'warn');
+                btn.textContent = isRunning ? '<%:Stop%>' : '<%:Start%>';
+            }
+            FWX.dom.setText('suricata-rules', data.rules_count || 0);
+            FWX.dom.setText('suricata-alerts', data.alerts_today || 0);
+            FWX.dom.setText('suricata-memory', data.memory || '-');
+        });
+    }
+    
+    function suricataControl(action, msgId, successMsg, delay) {
+        FWX.msg.show(msgId, '<%:Processing...%>');
+        FWX.api.post('suricata_control', {action: action}, function(data) {
+            FWX.msg.show(msgId, data && data.success ? (successMsg || data.message) : '<%:Operation failed%>', !data || !data.success);
+            if (delay) setTimeout(loadStatus, delay);
+        });
+    }
+    
+    window.toggleService = function() { suricataControl(isRunning ? 'stop' : 'start', 'service-msg', null, 2000); };
+    window.restartService = function() { suricataControl('restart', 'service-msg', null, 3000); };
+    window.reloadRules = function() { suricataControl('reload-rules', 'service-msg'); };
+    window.updateRules = function() { suricataControl('update-rules', 'rules-msg', '<%:Rules update started%>'); };
+    
+    function loadAlerts() {
+        FWX.api.get('suricata_alerts', function(data) {
+            if (data && data.alerts && data.alerts.length > 0) {
+                var rows = data.alerts.slice(0, 20).map(function(a) {
+                    return [a.timestamp || '-', a.signature || '-', (a.src_ip || '-') + ':' + (a.src_port || ''), (a.dest_ip || '-') + ':' + (a.dest_port || ''), a.severity || '-'];
+                });
+                FWX.table.render('suricata-alert-list', ['<%:Time%>', '<%:Signature%>', '<%:Source%>', '<%:Destination%>', '<%:Severity%>'], rows);
+            } else {
+                FWX.dom.setHtml('suricata-alert-list', '<em><%:No recent alerts%></em>');
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        FWX.refresh.start('status', loadStatus, 10000);
+        loadAlerts();
+    });
+})();
+</script>
+
+<%+cbi/valuefooter%>

@@ -18,6 +18,7 @@
 #include "fwx_user.h"
 #include "fwx_netlink.h"
 #include "fwx.h"
+#include "fwx_common.h"
 #define MAX_NL_RCV_BUF_SIZE 4096
 
 #define REPORT_INTERVAL_SECS 60
@@ -52,7 +53,7 @@ void fwx_netlink_handler(struct uloop_fd *u, unsigned int ev)
 
     if (ret < 0)
     {
-        printf("recv msg error\n");
+        LOG_ERROR("recv msg error");
         return;
     }
     else if (0 == ret)
@@ -65,13 +66,13 @@ void fwx_netlink_handler(struct uloop_fd *u, unsigned int ev)
     struct fwx_nl_msg_hdr *af_hdr = (struct fwx_nl_msg_hdr *)kmsg;
     if (af_hdr->magic != 0xa0b0c0d0)
     {
-        printf("magic error %x\n", af_hdr->magic);
+        LOG_ERROR("magic error %x", af_hdr->magic);
         return;
     }
 
     if (af_hdr->len <= 0 || af_hdr->len >= MAX_FWX_NETLINK_MSG_LEN)
     {
-        printf("data len error\n");
+        LOG_ERROR("data len error");
         return;
     }
 
@@ -82,13 +83,13 @@ void fwx_netlink_handler(struct uloop_fd *u, unsigned int ev)
         LOG_ERROR("parse json failed:%s", kdata);
         return;
     }
-    LOG_DEBUG("parse json success, kdata = %s\n", kdata);
+    LOG_DEBUG("parse json success, kdata = %s", kdata);
 
     struct json_object *mac_obj = json_object_object_get(root, "mac");
 
     if (!mac_obj)
     {
-        printf("parse mac obj failed\n");
+        LOG_ERROR("parse mac obj failed");
         json_object_put(root);
         return;
     }
@@ -102,7 +103,7 @@ void fwx_netlink_handler(struct uloop_fd *u, unsigned int ev)
         node = add_client_node(mac);
         if (!node)
         {
-            printf("add dev node failed\n");
+            LOG_ERROR("add dev node failed");
             json_object_put(root);
             return;
         }
@@ -290,7 +291,7 @@ int fwx_nl_send_msg_to_kernel(int fd, void *msg, int len)
 	free(nlh);
     if (!ret)
     {
-        perror("sendto error\n");
+        LOG_ERROR("sendto error");
         return -1;
     }
 

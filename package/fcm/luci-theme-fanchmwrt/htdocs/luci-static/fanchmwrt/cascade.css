@@ -1652,6 +1652,10 @@ header {
 	background-image: url('icons/fwx_internet_record-dark.png');
 }
 
+.menu-icon-fwx_security:before {
+	background-image: url('icons/fwx_advance-dark.png');
+}
+
 /* 菜单图标 - 暗色模式（使用原图标名称） */
 [data-darkmode="true"] .menu-icon-default:before {
 	background-image: url('/luci-static/fanchmwrt/icons/default.png');
@@ -1689,6 +1693,9 @@ header {
 	background-image: url('icons/fwx_internet_record.png');
 }
 
+[data-darkmode="true"] .menu-icon-fwx_security:before {
+	background-image: url('icons/fwx_advance.png');
+}
 
 
 

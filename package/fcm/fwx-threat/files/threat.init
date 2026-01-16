@@ -1,0 +1,49 @@
+#!/bin/sh /etc/rc.common
+# FWX Threat Intelligence Service
+
+START=95
+STOP=10
+USE_PROCD=1
+
+start_service() {
+    # Apply existing rules on boot
+    /usr/bin/fwx-threat-apply
+    
+    # Schedule auto-update via cron
+    local enable auto_update interval
+    
+    . /lib/functions.sh
+    config_load threat_intel
+    config_get enable global enable "0"
+    config_get auto_update global auto_update "1"
+    config_get interval global update_interval "24"
+    
+    [ "$enable" = "1" ] && [ "$auto_update" = "1" ] && {
+        # Add cron job
+        local cron_file="/etc/crontabs/root"
+        grep -q "fwx-threat-update" "$cron_file" 2>/dev/null || {
+            echo "0 */$interval * * * /usr/bin/fwx-threat-update update" >> "$cron_file"
+            /etc/init.d/cron reload 2>/dev/null
+        }
+    }
+}
+
+stop_service() {
+    # Remove nftables rules
+    nft delete table inet fwx_threat 2>/dev/null
+    
+    # Remove dnsmasq config
+    rm -f /tmp/dnsmasq.d/fwx-threat.conf
+    /etc/init.d/dnsmasq reload 2>/dev/null
+    
+    # Remove cron job
+    sed -i '/fwx-threat-update/d' /etc/crontabs/root 2>/dev/null
+}
+
+reload_service() {
+    /usr/bin/fwx-threat-apply
+}
+
+service_triggers() {
+    procd_add_reload_trigger "threat_intel"
+}

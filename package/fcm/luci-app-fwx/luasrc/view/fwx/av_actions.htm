@@ -1,0 +1,75 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="av-section">
+    <h4><%:Status%></h4>
+    <div class="av-status">
+        <div class="av-status-item">
+            <div class="label">ClamAV</div>
+            <div class="value" id="av-installed">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Realtime Monitor%></div>
+            <div class="value" id="av-realtime">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Quarantined%></div>
+            <div class="value" id="av-quarantine">-</div>
+        </div>
+    </div>
+    
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" onclick="updateDatabase()"><%:Update Database%></button>
+        <button class="cbi-button cbi-button-action" onclick="viewQuarantine()"><%:View Quarantine%></button>
+    </div>
+</div>
+
+<div class="av-section">
+    <h4><%:Manual Scan%></h4>
+    <div class="av-scan-input">
+        <input type="text" id="scan-path" placeholder="/path/to/scan" value="/tmp">
+        <button class="cbi-button cbi-button-apply" onclick="startScan()"><%:Start Scan%></button>
+    </div>
+    <div id="scan-status"></div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    
+    function loadStatus() {
+        FWX.api.get('av_status', function(data) {
+            if (!data) return;
+            FWX.status.setValue('av-installed', data.installed ? '<%:Installed%>' : '<%:Not Installed%>', data.installed ? 'ok' : 'error');
+            FWX.status.setValue('av-realtime', data.realtime_running ? '<%:Running%>' : '<%:Stopped%>', data.realtime_running ? 'ok' : 'warn');
+            FWX.dom.setText('av-quarantine', data.quarantine_count || 0);
+        });
+    }
+    
+    window.updateDatabase = function() {
+        FWX.msg.show('scan-status', '<%:Updating database...%>');
+        FWX.api.post('av_update', null, function(data) {
+            FWX.msg.show('scan-status', data && data.success ? '<%:Database update started%>' : '<%:Update failed%>', !data || !data.success);
+        });
+    };
+    
+    window.startScan = function() {
+        var path = FWX.dom.getValue('scan-path');
+        if (!path) { alert('<%:Please enter a path to scan%>'); return; }
+        FWX.msg.show('scan-status', '<%:Scan started...%>');
+        FWX.api.post('av_scan', {path: path}, function(data) {
+            FWX.msg.show('scan-status', data && data.success ? '<%:Scan running in background%>' : '<%:Scan failed to start%>', !data || !data.success);
+        });
+    };
+    
+    window.viewQuarantine = function() {
+        alert('<%:Check /etc/fwx/av/quarantine for quarantined files%>');
+    };
+    
+    document.addEventListener('DOMContentLoaded', loadStatus);
+})();
+</script>
+
+<%+cbi/valuefooter%>

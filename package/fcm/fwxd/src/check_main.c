@@ -18,6 +18,7 @@
 #include "fwx.h"
 #include "fwx_utils.h"
 #include "check_main.h"
+#include "fwx_common.h"
 
 #define INTERNET_CHECK_INTERVAL 30
 #define LOG_DIR_PATH "/tmp/log"
@@ -218,10 +219,10 @@ static void check_and_cleanup_log_dir(void) {
 }
 
 static void* check_thread_func(void *arg) {
-    LOG_DEBUG("check_thread: thread function started\n");
+    LOG_DEBUG("check_thread: thread function started");
     
     check_thread_running = 1;
-    LOG_DEBUG("check_thread: running\n");
+    LOG_DEBUG("check_thread: running");
     
     check_internet_connectivity();
     check_and_cleanup_log_dir();
@@ -238,7 +239,7 @@ static void* check_thread_func(void *arg) {
     }
     
     check_thread_running = 0;
-    LOG_DEBUG("check_thread: exited\n");
+    LOG_DEBUG("check_thread: exited");
     return NULL;
 }
 
@@ -253,7 +254,7 @@ int start_check_thread(void) {
         LOG_ERROR("Failed to create check_thread: %s\n", strerror(ret));
         return -1;
     }
-    LOG_INFO("check_thread: created\n");
+    LOG_INFO("check_thread: created");
     return 0;
 }
 

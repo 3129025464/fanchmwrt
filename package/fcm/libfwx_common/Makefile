@@ -42,6 +42,8 @@ endef
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/libfwx_common.so $(1)/usr/lib
+	$(INSTALL_DIR) $(1)/lib/fwx
+	$(INSTALL_DATA) ./files/lib/fwx/nft_atomic.sh $(1)/lib/fwx/
 endef
 
 define Build/InstallDev

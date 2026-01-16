@@ -1,0 +1,119 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-section">
+    <h4><%:Traffic Overview%></h4>
+    <div class="fwx-cards">
+        <div class="fwx-card info">
+            <h3><%:Total Flows%></h3>
+            <div class="value" id="stat-flows">-</div>
+        </div>
+        <div class="fwx-card info">
+            <h3><%:DNS Queries%></h3>
+            <div class="value" id="stat-dns">-</div>
+        </div>
+        <div class="fwx-card info">
+            <h3><%:HTTP Requests%></h3>
+            <div class="value" id="stat-http">-</div>
+        </div>
+        <div class="fwx-card info">
+            <h3><%:TLS Connections%></h3>
+            <div class="value" id="stat-tls">-</div>
+        </div>
+    </div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Top Talkers%></h4>
+    <div id="top-talkers"><em><%:Loading...%></em></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Top Domains%></h4>
+    <div id="top-domains"><em><%:Loading...%></em></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Top Ports%></h4>
+    <div id="top-ports"><em><%:Loading...%></em></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Protocol Distribution%></h4>
+    <div id="protocol-dist"><em><%:Loading...%></em></div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    
+    function renderProtocolDist(protocols) {
+        var container = document.getElementById('protocol-dist');
+        var total = 0;
+        for (var p in protocols) total += protocols[p];
+        
+        if (total === 0) {
+            container.innerHTML = '<em><%:No data%></em>';
+            return;
+        }
+        
+        var colors = {tcp: '#4CAF50', udp: '#2196F3', icmp: '#FF9800', other: '#9E9E9E'};
+        var html = '<div class="protocol-bars">';
+        for (var proto in protocols) {
+            var pct = ((protocols[proto] / total) * 100).toFixed(1);
+            var color = colors[proto.toLowerCase()] || colors.other;
+            html += '<div class="protocol-bar-item"><span class="protocol-name">' + proto.toUpperCase() + '</span>';
+            html += '<div class="protocol-bar-bg"><div class="protocol-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>';
+            html += '<span class="protocol-pct">' + pct + '%</span></div>';
+        }
+        container.innerHTML = html + '</div>';
+    }
+    
+    function loadStats() {
+        FWX.api.get('traffic_stats', function(data) {
+            if (!data) return;
+            
+            FWX.dom.setText('stat-flows', FWX.format.number(data.total_flows || 0));
+            FWX.dom.setText('stat-dns', FWX.format.number(data.dns_queries || 0));
+            FWX.dom.setText('stat-http', FWX.format.number(data.http_requests || 0));
+            FWX.dom.setText('stat-tls', FWX.format.number(data.tls_connections || 0));
+            
+            // Top Talkers
+            if (data.top_talkers && data.top_talkers.length > 0) {
+                var rows = data.top_talkers.map(function(t) {
+                    return [t.ip, FWX.format.bytes(t.bytes_in), FWX.format.bytes(t.bytes_out), t.flows];
+                });
+                FWX.table.render('top-talkers', ['<%:IP Address%>', '<%:Bytes In%>', '<%:Bytes Out%>', '<%:Flows%>'], rows);
+            } else {
+                FWX.dom.setHtml('top-talkers', '<em><%:No data%></em>');
+            }
+            
+            // Top Domains
+            if (data.top_domains && data.top_domains.length > 0) {
+                var rows = data.top_domains.map(function(d) { return [d.domain, d.count, d.type || 'A']; });
+                FWX.table.render('top-domains', ['<%:Domain%>', '<%:Queries%>', '<%:Type%>'], rows);
+            } else {
+                FWX.dom.setHtml('top-domains', '<em><%:No data%></em>');
+            }
+            
+            // Top Ports
+            if (data.top_ports && data.top_ports.length > 0) {
+                var rows = data.top_ports.map(function(p) { return [p.port, p.proto || 'TCP', p.count, p.service || '-']; });
+                FWX.table.render('top-ports', ['<%:Port%>', '<%:Protocol%>', '<%:Connections%>', '<%:Service%>'], rows);
+            } else {
+                FWX.dom.setHtml('top-ports', '<em><%:No data%></em>');
+            }
+            
+            renderProtocolDist(data.protocols || {});
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        FWX.refresh.start('traffic', loadStats, 30000);
+    });
+})();
+</script>
+
+<%+cbi/valuefooter%>

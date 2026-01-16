@@ -1,0 +1,1041 @@
+# FanchMWRT Security Center - Chinese Simplified
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_Hans\n"
+
+msgid "Security Center"
+msgstr "安全中心"
+
+msgid "Dashboard"
+msgstr "仪表盘"
+
+msgid "App Filter"
+msgstr "应用过滤"
+
+msgid "MAC Filter"
+msgstr "MAC过滤"
+
+msgid "Threat Intel"
+msgstr "威胁情报"
+
+msgid "IDS/IPS"
+msgstr "入侵检测"
+
+msgid "Alerts"
+msgstr "安全告警"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "FanchMWRT Security Center"
+msgstr "FanchMWRT 安全中心"
+
+msgid "Threat IPs"
+msgstr "威胁IP数"
+
+msgid "Threat Domains"
+msgstr "威胁域名数"
+
+msgid "IDS Blocked"
+msgstr "IDS拦截"
+
+msgid "Alerts Today"
+msgstr "今日告警"
+
+msgid "Quick Actions"
+msgstr "快捷操作"
+
+msgid "Update Threat Intel"
+msgstr "更新威胁情报"
+
+msgid "Recent Alerts"
+msgstr "最近告警"
+
+msgid "Loading..."
+msgstr "加载中..."
+
+msgid "No alerts"
+msgstr "暂无告警"
+
+msgid "Security Alerts"
+msgstr "安全告警"
+
+msgid "All Levels"
+msgstr "所有级别"
+
+msgid "All Types"
+msgstr "所有类型"
+
+msgid "Refresh"
+msgstr "刷新"
+
+msgid "Clear All"
+msgstr "清空"
+
+msgid "Time"
+msgstr "时间"
+
+msgid "Level"
+msgstr "级别"
+
+msgid "Type"
+msgstr "类型"
+
+msgid "Source"
+msgstr "来源"
+
+msgid "Destination"
+msgstr "目标"
+
+msgid "Detail"
+msgstr "详情"
+
+msgid "Threat Intelligence"
+msgstr "威胁情报"
+
+msgid "Global Settings"
+msgstr "全局设置"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "Auto Update"
+msgstr "自动更新"
+
+msgid "Update Interval (hours)"
+msgstr "更新间隔(小时)"
+
+msgid "Log Blocked"
+msgstr "记录拦截"
+
+msgid "Action"
+msgstr "动作"
+
+msgid "Drop"
+msgstr "丢弃"
+
+msgid "Reject"
+msgstr "拒绝"
+
+msgid "Threat Sources"
+msgstr "威胁源"
+
+msgid "Name"
+msgstr "名称"
+
+msgid "IP Blacklist"
+msgstr "IP黑名单"
+
+msgid "Domain Blacklist"
+msgstr "域名黑名单"
+
+msgid "URL"
+msgstr "地址"
+
+msgid "Format"
+msgstr "格式"
+
+msgid "Plain Text"
+msgstr "纯文本"
+
+msgid "Hosts File"
+msgstr "Hosts文件"
+
+msgid "Whitelist"
+msgstr "白名单"
+
+msgid "IP Whitelist"
+msgstr "IP白名单"
+
+msgid "Domain Whitelist"
+msgstr "域名白名单"
+
+msgid "Manual Actions"
+msgstr "手动操作"
+
+msgid "Update Now"
+msgstr "立即更新"
+
+msgid "Statistics"
+msgstr "统计"
+
+msgid "Intrusion Detection System"
+msgstr "入侵检测系统"
+
+msgid "Enable IDS"
+msgstr "启用IDS"
+
+msgid "Log Level"
+msgstr "日志级别"
+
+msgid "Port Scan Detection"
+msgstr "端口扫描检测"
+
+msgid "Threshold"
+msgstr "阈值"
+
+msgid "Interval (seconds)"
+msgstr "间隔(秒)"
+
+msgid "Block"
+msgstr "阻止"
+
+msgid "Log Only"
+msgstr "仅记录"
+
+msgid "Block Time (seconds)"
+msgstr "阻止时间(秒)"
+
+msgid "SYN Flood Protection"
+msgstr "SYN洪水防护"
+
+msgid "Rate Limit (per second)"
+msgstr "速率限制(每秒)"
+
+msgid "Burst"
+msgstr "突发"
+
+msgid "Brute Force Protection"
+msgstr "暴力破解防护"
+
+msgid "SSH Protection"
+msgstr "SSH防护"
+
+msgid "SSH Max Retries"
+msgstr "SSH最大重试"
+
+msgid "SSH Block Time (seconds)"
+msgstr "SSH阻止时间(秒)"
+
+msgid "Web Protection"
+msgstr "Web防护"
+
+msgid "Web Max Retries"
+msgstr "Web最大重试"
+
+msgid "ICMP Flood Protection"
+msgstr "ICMP洪水防护"
+
+msgid "Currently Blocked IPs"
+msgstr "当前阻止的IP"
+
+msgid "Unblock"
+msgstr "解除阻止"
+
+msgid "IP Address"
+msgstr "IP地址"
+
+msgid "Application Filter"
+msgstr "应用过滤"
+
+msgid "Work Mode"
+msgstr "工作模式"
+
+msgid "Gateway Mode"
+msgstr "网关模式"
+
+msgid "Bypass Mode"
+msgstr "旁路模式"
+
+msgid "Bridge Mode"
+msgstr "桥接模式"
+
+msgid "Enable Recording"
+msgstr "启用记录"
+
+msgid "LAN Interface"
+msgstr "LAN接口"
+
+msgid "Feature Database"
+msgstr "特征库"
+
+msgid "Format Version"
+msgstr "格式版本"
+
+msgid "FWX Settings"
+msgstr "FWX设置"
+
+msgid "General"
+msgstr "常规"
+
+msgid "Theme Mode"
+msgstr "主题模式"
+
+msgid "Light"
+msgstr "浅色"
+
+msgid "Dark"
+msgstr "深色"
+
+msgid "Auto"
+msgstr "自动"
+
+msgid "Security Modules"
+msgstr "安全模块"
+
+msgid "Antivirus Scan"
+msgstr "病毒扫描"
+
+msgid "DNS Security"
+msgstr "DNS安全"
+
+msgid "Alert Settings"
+msgstr "告警设置"
+
+msgid "Enable Alerts"
+msgstr "启用告警"
+
+msgid "Log File"
+msgstr "日志文件"
+
+msgid "Max Log Size (KB)"
+msgstr "最大日志大小(KB)"
+
+msgid "Email Alerts"
+msgstr "邮件告警"
+
+msgid "Email To"
+msgstr "收件人"
+
+msgid "SMTP Server"
+msgstr "SMTP服务器"
+
+msgid "Record Settings"
+msgstr "记录设置"
+
+msgid "Record Time (days)"
+msgstr "记录时间(天)"
+
+msgid "History Size (MB)"
+msgstr "历史大小(MB)"
+
+msgid "History Path"
+msgstr "历史路径"
+
+
+msgid "Antivirus"
+msgstr "病毒扫描"
+
+msgid "ClamAV integration for malware scanning."
+msgstr "ClamAV病毒扫描集成"
+
+msgid "Auto Update Database"
+msgstr "自动更新病毒库"
+
+msgid "Scan Settings"
+msgstr "扫描设置"
+
+msgid "Realtime Scanning"
+msgstr "实时扫描"
+
+msgid "Monitor directories for new files (requires inotify-tools)"
+msgstr "监控目录中的新文件(需要inotify-tools)"
+
+msgid "Realtime Scan Paths"
+msgstr "实时扫描路径"
+
+msgid "Space-separated list of directories to monitor"
+msgstr "空格分隔的监控目录列表"
+
+msgid "Max File Size (MB)"
+msgstr "最大文件大小(MB)"
+
+msgid "Scan Archives"
+msgstr "扫描压缩包"
+
+msgid "Quarantine Path"
+msgstr "隔离区路径"
+
+msgid "Scheduled Scan"
+msgstr "定时扫描"
+
+msgid "Enable Scheduled Scan"
+msgstr "启用定时扫描"
+
+msgid "Scan Path"
+msgstr "扫描路径"
+
+msgid "Scan Time"
+msgstr "扫描时间"
+
+msgid "Time in HH:MM format"
+msgstr "HH:MM格式的时间"
+
+msgid "Detection Action"
+msgstr "检测动作"
+
+msgid "On Detection"
+msgstr "检测到威胁时"
+
+msgid "Quarantine"
+msgstr "隔离"
+
+msgid "Delete"
+msgstr "删除"
+
+msgid "Send Alert"
+msgstr "发送告警"
+
+msgid "Status"
+msgstr "状态"
+
+msgid "Realtime Monitor"
+msgstr "实时监控"
+
+msgid "Quarantined"
+msgstr "已隔离"
+
+msgid "Installed"
+msgstr "已安装"
+
+msgid "Not Installed"
+msgstr "未安装"
+
+msgid "Running"
+msgstr "运行中"
+
+msgid "Stopped"
+msgstr "已停止"
+
+msgid "Update Database"
+msgstr "更新病毒库"
+
+msgid "View Quarantine"
+msgstr "查看隔离区"
+
+msgid "Manual Scan"
+msgstr "手动扫描"
+
+msgid "Start Scan"
+msgstr "开始扫描"
+
+msgid "Updating database..."
+msgstr "正在更新病毒库..."
+
+msgid "Database update started"
+msgstr "病毒库更新已开始"
+
+msgid "Update failed"
+msgstr "更新失败"
+
+msgid "Please enter a path to scan"
+msgstr "请输入扫描路径"
+
+msgid "Scan started..."
+msgstr "扫描已开始..."
+
+msgid "Scan running in background"
+msgstr "扫描正在后台运行"
+
+msgid "Scan failed to start"
+msgstr "扫描启动失败"
+
+msgid "Check /etc/fwx/av/quarantine for quarantined files"
+msgstr "查看 /etc/fwx/av/quarantine 目录中的隔离文件"
+
+msgid "Suricata IDS"
+msgstr "Suricata入侵检测"
+
+msgid "Rules Count"
+msgstr "规则数量"
+
+msgid "Update Rules"
+msgstr "更新规则"
+
+msgid "Threat intelligence update started"
+msgstr "威胁情报更新已开始"
+
+msgid "Are you sure you want to clear all alerts?"
+msgstr "确定要清空所有告警吗？"
+
+msgid "Alerts cleared"
+msgstr "告警已清空"
+
+msgid "No matching alerts"
+msgstr "没有匹配的告警"
+
+msgid "Manual Update"
+msgstr "手动更新"
+
+msgid "Update Threat Lists Now"
+msgstr "立即更新威胁列表"
+
+msgid "Updating..."
+msgstr "更新中..."
+
+msgid "Update started in background"
+msgstr "更新已在后台开始"
+
+msgid "Last Update"
+msgstr "最后更新"
+
+msgid "Blocked IPs"
+msgstr "已阻止的IP"
+
+msgid "Suricata Deep IDS"
+msgstr "Suricata深度入侵检测"
+
+msgid "Start"
+msgstr "启动"
+
+msgid "Stop"
+msgstr "停止"
+
+msgid "Rules"
+msgstr "规则"
+
+msgid "Updating rules..."
+msgstr "正在更新规则..."
+
+msgid "Rules update started"
+msgstr "规则更新已开始"
+
+msgid "Operation failed"
+msgstr "操作失败"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "Warning"
+msgstr "警告"
+
+msgid "Info"
+msgstr "信息"
+
+msgid "Debug"
+msgstr "调试"
+
+
+# Suricata Deep IDS
+msgid "Suricata Deep IDS"
+msgstr "Suricata深度入侵检测"
+
+msgid "Advanced intrusion detection with Suricata engine."
+msgstr "基于Suricata引擎的高级入侵检测"
+
+msgid "Enable Suricata"
+msgstr "启用Suricata"
+
+msgid "Run Mode"
+msgstr "运行模式"
+
+msgid "IDS - Detection Only"
+msgstr "IDS - 仅检测"
+
+msgid "IPS - Inline Prevention"
+msgstr "IPS - 在线防护"
+
+msgid "Monitor Interface"
+msgstr "监控接口"
+
+msgid "Home Network"
+msgstr "内网网段"
+
+msgid "Threading Mode"
+msgstr "线程模式"
+
+msgid "Single Thread"
+msgstr "单线程"
+
+msgid "Auto Flow Pinning"
+msgstr "自动流绑定"
+
+msgid "Workers"
+msgstr "工作线程"
+
+msgid "Detection Threads"
+msgstr "检测线程数"
+
+msgid "Stream Memory Cap (MB)"
+msgstr "流内存上限(MB)"
+
+msgid "Flow Memory Cap (MB)"
+msgstr "流表内存上限(MB)"
+
+msgid "Rule Sources"
+msgstr "规则源"
+
+msgid "Emerging Threats Open"
+msgstr "Emerging Threats开源规则"
+
+msgid "Free community ruleset"
+msgstr "免费社区规则集"
+
+msgid "Emerging Threats Pro"
+msgstr "Emerging Threats专业版"
+
+msgid "Commercial ruleset (requires subscription)"
+msgstr "商业规则集(需要订阅)"
+
+msgid "ET Pro Code"
+msgstr "ET Pro授权码"
+
+msgid "Snort Community"
+msgstr "Snort社区规则"
+
+msgid "Abuse.ch SSL Blacklist"
+msgstr "Abuse.ch SSL黑名单"
+
+msgid "Custom Rules URL"
+msgstr "自定义规则URL"
+
+msgid "Rule Categories"
+msgstr "规则分类"
+
+msgid "Malware"
+msgstr "恶意软件"
+
+msgid "Exploits"
+msgstr "漏洞利用"
+
+msgid "Scanning"
+msgstr "扫描探测"
+
+msgid "DoS Attacks"
+msgstr "DoS攻击"
+
+msgid "Web Attacks"
+msgstr "Web攻击"
+
+msgid "Trojans"
+msgstr "木马"
+
+msgid "Botnets"
+msgstr "僵尸网络"
+
+msgid "Policy Violations"
+msgstr "策略违规"
+
+msgid "EVE JSON Logging"
+msgstr "EVE JSON日志"
+
+msgid "Enable EVE Log"
+msgstr "启用EVE日志"
+
+msgid "JSON format logging for analysis"
+msgstr "JSON格式日志用于分析"
+
+msgid "Log Path"
+msgstr "日志路径"
+
+msgid "Log Alerts"
+msgstr "记录告警"
+
+msgid "Log DNS"
+msgstr "记录DNS"
+
+msgid "Log HTTP"
+msgstr "记录HTTP"
+
+msgid "Log TLS"
+msgstr "记录TLS"
+
+msgid "Log Flows"
+msgstr "记录流"
+
+msgid "Log Statistics"
+msgstr "记录统计"
+
+msgid "Service Status"
+msgstr "服务状态"
+
+msgid "Rules Loaded"
+msgstr "已加载规则"
+
+msgid "Memory Usage"
+msgstr "内存使用"
+
+msgid "Reload Rules"
+msgstr "重载规则"
+
+msgid "Rule Management"
+msgstr "规则管理"
+
+msgid "View Rules"
+msgstr "查看规则"
+
+msgid "Restarting..."
+msgstr "重启中..."
+
+msgid "Reloading rules..."
+msgstr "重载规则中..."
+
+msgid "No recent alerts"
+msgstr "暂无最近告警"
+
+msgid "Signature"
+msgstr "签名"
+
+msgid "Severity"
+msgstr "严重程度"
+
+# Traffic Analysis
+msgid "Traffic Analysis"
+msgstr "流量分析"
+
+msgid "Network traffic statistics and analysis based on Suricata EVE logs."
+msgstr "基于Suricata EVE日志的网络流量统计和分析"
+
+msgid "Enable Traffic Analysis"
+msgstr "启用流量分析"
+
+msgid "EVE Log Path"
+msgstr "EVE日志路径"
+
+msgid "Statistics Interval (seconds)"
+msgstr "统计间隔(秒)"
+
+msgid "Data Retention (days)"
+msgstr "数据保留(天)"
+
+msgid "Protocol Statistics"
+msgstr "协议统计"
+
+msgid "DNS Statistics"
+msgstr "DNS统计"
+
+msgid "Track DNS queries and responses"
+msgstr "跟踪DNS查询和响应"
+
+msgid "HTTP Statistics"
+msgstr "HTTP统计"
+
+msgid "Track HTTP requests and responses"
+msgstr "跟踪HTTP请求和响应"
+
+msgid "TLS Statistics"
+msgstr "TLS统计"
+
+msgid "Track TLS/SSL connections"
+msgstr "跟踪TLS/SSL连接"
+
+msgid "Flow Statistics"
+msgstr "流统计"
+
+msgid "Track network flows"
+msgstr "跟踪网络流"
+
+msgid "Top N Statistics"
+msgstr "Top N统计"
+
+msgid "Top N Count"
+msgstr "Top N数量"
+
+msgid "Top Talkers"
+msgstr "流量排行"
+
+msgid "Track hosts with most traffic"
+msgstr "跟踪流量最大的主机"
+
+msgid "Top Domains"
+msgstr "域名排行"
+
+msgid "Track most queried domains"
+msgstr "跟踪查询最多的域名"
+
+msgid "Top Ports"
+msgstr "端口排行"
+
+msgid "Track most used ports"
+msgstr "跟踪使用最多的端口"
+
+msgid "Top Applications"
+msgstr "应用排行"
+
+msgid "Track most used applications"
+msgstr "跟踪使用最多的应用"
+
+msgid "Anomaly Detection"
+msgstr "异常检测"
+
+msgid "Enable Anomaly Detection"
+msgstr "启用异常检测"
+
+msgid "Baseline Period (days)"
+msgstr "基线周期(天)"
+
+msgid "Days of data to establish baseline"
+msgstr "建立基线所需的数据天数"
+
+msgid "Anomaly Threshold (%)"
+msgstr "异常阈值(%)"
+
+msgid "Deviation percentage to trigger alert"
+msgstr "触发告警的偏差百分比"
+
+msgid "Bandwidth Anomalies"
+msgstr "带宽异常"
+
+msgid "Connection Anomalies"
+msgstr "连接异常"
+
+msgid "DNS Anomalies"
+msgstr "DNS异常"
+
+msgid "Traffic Overview"
+msgstr "流量概览"
+
+msgid "Total Flows"
+msgstr "总流数"
+
+msgid "DNS Queries"
+msgstr "DNS查询"
+
+msgid "HTTP Requests"
+msgstr "HTTP请求"
+
+msgid "TLS Connections"
+msgstr "TLS连接"
+
+msgid "Bytes In"
+msgstr "入站字节"
+
+msgid "Bytes Out"
+msgstr "出站字节"
+
+msgid "Flows"
+msgstr "流数"
+
+msgid "Domain"
+msgstr "域名"
+
+msgid "Queries"
+msgstr "查询数"
+
+msgid "Port"
+msgstr "端口"
+
+msgid "Protocol"
+msgstr "协议"
+
+msgid "Connections"
+msgstr "连接数"
+
+msgid "Service"
+msgstr "服务"
+
+msgid "Protocol Distribution"
+msgstr "协议分布"
+
+msgid "No data"
+msgstr "暂无数据"
+
+# Notifications
+msgid "Alert Notifications"
+msgstr "告警通知"
+
+msgid "Configure email and webhook notifications for security alerts."
+msgstr "配置安全告警的邮件和Webhook通知"
+
+msgid "Enable Notifications"
+msgstr "启用通知"
+
+msgid "Minimum Alert Level"
+msgstr "最低告警级别"
+
+msgid "Only send notifications for alerts at or above this level"
+msgstr "仅发送此级别及以上的告警通知"
+
+msgid "Rate Limit (per hour)"
+msgstr "速率限制(每小时)"
+
+msgid "Maximum notifications per hour (0 = unlimited)"
+msgstr "每小时最大通知数(0=不限制)"
+
+msgid "Aggregate Alerts"
+msgstr "聚合告警"
+
+msgid "Combine multiple alerts into single notification"
+msgstr "将多个告警合并为单个通知"
+
+msgid "Aggregate Interval (minutes)"
+msgstr "聚合间隔(分钟)"
+
+msgid "Email Notifications"
+msgstr "邮件通知"
+
+msgid "Enable Email"
+msgstr "启用邮件"
+
+msgid "SMTP Server"
+msgstr "SMTP服务器"
+
+msgid "SMTP Port"
+msgstr "SMTP端口"
+
+msgid "Security"
+msgstr "安全"
+
+msgid "None"
+msgstr "无"
+
+msgid "Username"
+msgstr "用户名"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "From Address"
+msgstr "发件人地址"
+
+msgid "To Addresses"
+msgstr "收件人地址"
+
+msgid "Subject Prefix"
+msgstr "主题前缀"
+
+msgid "Webhook Notifications"
+msgstr "Webhook通知"
+
+msgid "Enable Webhook"
+msgstr "启用Webhook"
+
+msgid "Webhook URL"
+msgstr "Webhook地址"
+
+msgid "HTTP Method"
+msgstr "HTTP方法"
+
+msgid "Payload Format"
+msgstr "载荷格式"
+
+msgid "Custom"
+msgstr "自定义"
+
+msgid "Telegram Bot Token"
+msgstr "Telegram机器人Token"
+
+msgid "Telegram Chat ID"
+msgstr "Telegram聊天ID"
+
+msgid "Custom Template"
+msgstr "自定义模板"
+
+msgid "Custom Headers"
+msgstr "自定义头"
+
+msgid "Timeout (seconds)"
+msgstr "超时(秒)"
+
+msgid "Verify SSL Certificate"
+msgstr "验证SSL证书"
+
+msgid "Alert Types"
+msgstr "告警类型"
+
+msgid "Select which alert types to send notifications for"
+msgstr "选择要发送通知的告警类型"
+
+msgid "Threat IP Blocked"
+msgstr "威胁IP拦截"
+
+msgid "Threat Domain Blocked"
+msgstr "威胁域名拦截"
+
+msgid "Port Scan Detected"
+msgstr "端口扫描检测"
+
+msgid "SYN Flood Detected"
+msgstr "SYN洪水检测"
+
+msgid "Brute Force Detected"
+msgstr "暴力破解检测"
+
+msgid "Malware Detected"
+msgstr "恶意软件检测"
+
+msgid "Suricata Alerts"
+msgstr "Suricata告警"
+
+msgid "Test Notifications"
+msgstr "测试通知"
+
+msgid "Test Email"
+msgstr "测试邮件"
+
+msgid "Test Webhook"
+msgstr "测试Webhook"
+
+msgid "Sending test email..."
+msgstr "正在发送测试邮件..."
+
+msgid "Test email sent"
+msgstr "测试邮件已发送"
+
+msgid "Sending test webhook..."
+msgstr "正在发送测试Webhook..."
+
+msgid "Test webhook sent"
+msgstr "测试Webhook已发送"
+
+msgid "Failed"
+msgstr "失败"
+
+msgid "Recent Notifications"
+msgstr "最近通知"
+
+msgid "No notification history"
+msgstr "暂无通知历史"
+
+
+# Security Profile
+msgid "Security Profile"
+msgstr "安全档位"
+
+msgid "Hardware Information"
+msgstr "硬件信息"
+
+msgid "Memory"
+msgstr "内存"
+
+msgid "CPU Cores"
+msgstr "CPU核心"
+
+msgid "CPU Model"
+msgstr "CPU型号"
+
+msgid "Recommended profile based on your hardware"
+msgstr "根据您的硬件推荐的档位"
+
+msgid "Recommended"
+msgstr "推荐"
+
+msgid "Requires"
+msgstr "需要"
+
+msgid "cores"
+msgstr "核心"
+
+msgid "Lite"
+msgstr "精简"
+
+msgid "Full"
+msgstr "完整"
+
+msgid "Traffic"
+msgstr "流量分析"
+
+msgid "Hardware requirements not met"
+msgstr "硬件要求不满足"
+
+msgid "Apply Selected Profile"
+msgstr "应用选中的档位"
+
+msgid "Applying profile..."
+msgstr "正在应用档位..."
+
+msgid "Profile applied successfully"
+msgstr "档位应用成功"
+
+msgid "Failed to apply profile"
+msgstr "档位应用失败"
+
+msgid "Selected profile exceeds your hardware capabilities. Performance may be affected."
+msgstr "选择的档位超出您的硬件能力，可能影响性能。"
+
+msgid "Selected profile is higher than recommended. Monitor system performance."
+msgstr "选择的档位高于推荐值，请关注系统性能。"
+
+msgid "Select security protection level based on your device capabilities."
+msgstr "根据您的设备能力选择安全防护级别。"

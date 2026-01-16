@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Add menu entry
+uci -q batch <<-EOF >/dev/null
+    delete ucitrack.@fwx[-1]
+    add ucitrack fwx
+    set ucitrack.@fwx[-1].init=fwx
+    commit ucitrack
+EOF
+
+# Ensure services are enabled
+[ -x /etc/init.d/fwx ] && /etc/init.d/fwx enable
+[ -x /etc/init.d/fwx-threat ] && /etc/init.d/fwx-threat enable
+[ -x /etc/init.d/fwx-ids ] && /etc/init.d/fwx-ids enable
+
+rm -f /tmp/luci-indexcache
+exit 0

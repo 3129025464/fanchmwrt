@@ -11,7 +11,7 @@ return baseclass.extend({
 		'fwx_dashboard': 'fwx_dashboard',
 		'fwx_internet_record': 'fwx_internet_record',
 		'fwx_user': 'fwx_user',
-		'fwx_wireless': 'fwx_wireless',
+		'fwx_security': 'fwx_security',
 	},
 	defaultIcon: 'default',
 	__init__() {
@@ -317,6 +317,7 @@ return baseclass.extend({
 			'fwx_internet_record',
 			'fwx_advance',    
 			'fwx_network',
+			'fwx_security',
 			'logout'
 		];
 

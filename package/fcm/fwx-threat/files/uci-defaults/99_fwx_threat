@@ -1,0 +1,11 @@
+#!/bin/sh
+# FWX Threat Intelligence UCI defaults
+
+mkdir -p /etc/fwx/threat
+touch /etc/fwx/threat/ip_blacklist.txt
+touch /etc/fwx/threat/domain_blacklist.txt
+
+# Initial update (background)
+( sleep 60 && /usr/bin/fwx-threat-update update ) &
+
+exit 0

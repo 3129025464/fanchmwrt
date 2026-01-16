@@ -1,0 +1,108 @@
+<%+header%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="alerts-container">
+    <h1><%:Security Alerts%></h1>
+    
+    <div class="alerts-toolbar">
+        <div class="filter-group">
+            <select id="filter-level">
+                <option value=""><%:All Levels%></option>
+                <option value="info">Info</option>
+                <option value="warning">Warning</option>
+                <option value="critical">Critical</option>
+                <option value="emergency">Emergency</option>
+            </select>
+            <select id="filter-type">
+                <option value=""><%:All Types%></option>
+                <option value="threat_ip">Threat IP</option>
+                <option value="threat_domain">Threat Domain</option>
+                <option value="portscan">Port Scan</option>
+                <option value="synflood">SYN Flood</option>
+                <option value="bruteforce">Brute Force</option>
+            </select>
+        </div>
+        <div>
+            <button class="fwx-btn fwx-btn-primary" onclick="refreshAlerts()"><%:Refresh%></button>
+            <button class="fwx-btn fwx-btn-danger" onclick="clearAlerts()"><%:Clear All%></button>
+        </div>
+    </div>
+    
+    <table class="alerts-table">
+        <thead>
+            <tr>
+                <th><%:Time%></th>
+                <th><%:Level%></th>
+                <th><%:Type%></th>
+                <th><%:Source%></th>
+                <th><%:Destination%></th>
+                <th><%:Detail%></th>
+            </tr>
+        </thead>
+        <tbody id="alerts-tbody">
+            <tr><td colspan="6" class="text-center"><%:Loading...%></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+(function() {
+    var apiBase = '<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/';
+    FWX.init(apiBase);
+    
+    function parseAlert(line) {
+        var m = line.match(/\[([^\]]+)\]\s*\[([^\]]+)\]\s*\[([^\]]+)\]\s*src=([^\s]+)\s*dst=([^\s]+)\s*(.*)/);
+        return m ? {time: m[1], level: m[2], type: m[3], src: m[4], dst: m[5], detail: m[6]} : null;
+    }
+    
+    function renderAlerts(alerts) {
+        var tbody = document.getElementById('alerts-tbody');
+        var levelFilter = FWX.dom.getValue('filter-level');
+        var typeFilter = FWX.dom.getValue('filter-type');
+        
+        if (!alerts || alerts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center"><%:No alerts%></td></tr>';
+            return;
+        }
+        
+        var html = '';
+        alerts.forEach(function(line) {
+            var a = parseAlert(line);
+            if (!a) return;
+            if (levelFilter && a.level !== levelFilter) return;
+            if (typeFilter && a.type !== typeFilter) return;
+            
+            html += '<tr><td>' + FWX.format.escape(a.time) + '</td>';
+            html += '<td><span class="alert-level ' + a.level + '">' + a.level + '</span></td>';
+            html += '<td>' + FWX.format.escape(a.type) + '</td>';
+            html += '<td>' + FWX.format.escape(a.src) + '</td>';
+            html += '<td>' + FWX.format.escape(a.dst) + '</td>';
+            html += '<td>' + FWX.format.escape(a.detail || '-') + '</td></tr>';
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="6" class="text-center"><%:No matching alerts%></td></tr>';
+    }
+    
+    window.refreshAlerts = function() {
+        FWX.api.get('alerts', function(data) {
+            if (data && data.alerts) renderAlerts(data.alerts);
+        });
+    };
+    
+    window.clearAlerts = function() {
+        if (confirm('<%:Are you sure you want to clear all alerts?%>')) {
+            FWX.api.post('alerts_clear', null, function(data) {
+                if (data && data.success) refreshAlerts();
+            });
+        }
+    };
+    
+    document.getElementById('filter-level').addEventListener('change', refreshAlerts);
+    document.getElementById('filter-type').addEventListener('change', refreshAlerts);
+    document.addEventListener('DOMContentLoaded', refreshAlerts);
+})();
+</script>
+
+<%+footer%>

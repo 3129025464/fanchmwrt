@@ -24,6 +24,7 @@
 #include "fwx.h"
 #include "fwx_user.h"
 #include "fwx_utils.h"
+#include "fwx_common.h"
 
 
 LIST_HEAD(client_list);
@@ -403,7 +404,7 @@ static void cleanup_expired_files_by_days(void) {
 }
 
 void check_and_cleanup_history_data_by_size(void) {
-    LOG_INFO("check_and_cleanup_history_data_by_size: start\n");
+    LOG_INFO("check_and_cleanup_history_data_by_size: start");
     cleanup_expired_files_by_days();
     
     struct uci_context *uci_ctx = uci_alloc_context();
@@ -476,7 +477,7 @@ void add_visit_info_node(struct list_head *visit_list, visit_info_t *node)
 void init_client_list(void)
 {
     INIT_LIST_HEAD(&client_list);
-    printf("init client list ok...\n");
+    LOG_INFO("init client list ok");
 }
 
 client_node_t *add_client_node(char *mac)
@@ -523,7 +524,7 @@ client_node_t *add_client_node(char *mac)
 
     list_add(&node->client, &client_list);
     g_cur_user_num++;
-    printf("add mac:%s to client list....success\n", mac);
+    LOG_DEBUG("add mac:%s to client list", mac);
     return node;
 }
 
@@ -545,7 +546,7 @@ void client_foreach(void *arg, iter_func iter)
     client_node_t *node = NULL;
     int count = 0;
 
-    LOG_DEBUG("client_foreach: Starting iteration over client_list...\n");
+    LOG_DEBUG("client_foreach: Starting iteration over client_list...");
     list_for_each_entry(node, &client_list, client) {
         count++;
         LOG_DEBUG("client_foreach: Processing client[%d] - mac=%s, online=%d\n", 
@@ -574,7 +575,7 @@ void update_client_hostname(void)
     FILE *fp = fopen("/tmp/dhcp.leases", "r");
     if (!fp)
     {
-        printf("open dhcp lease file....failed\n");
+        LOG_DEBUG("open dhcp lease file failed");
         return;
     }
     while (fgets(line_buf, sizeof(line_buf), fp))
@@ -658,7 +659,7 @@ void update_client_from_kernel(void)
     FILE *fp = fopen("/proc/net/af_client", "r");
     if (!fp)
     {
-        printf("open client file....failed\n");
+        LOG_DEBUG("open client file failed");
         return;
     }
     fgets(line_buf, sizeof(line_buf), fp); // title
@@ -666,15 +667,15 @@ void update_client_from_kernel(void)
     {
         int id;
         int parsed = sscanf(line_buf, "%d %s %s %s %u %u", &id, mac_buf, ip_buf, ipv6_buf, &up_rate, &down_rate);
-        LOG_DEBUG("update_client_from_kernel: parsed = %d, line_buf = %s\n", parsed, line_buf);
+        LOG_DEBUG("update_client_from_kernel: parsed = %d, line_buf = %s", parsed, line_buf);
         if (parsed < 3) 
         {
-            printf("invalid line format:%s\n", line_buf);
+            LOG_DEBUG("invalid line format:%s", line_buf);
             continue;
         }
         if (strlen(mac_buf) < 17)
         {
-            printf("invalid mac:%s\n", mac_buf);
+            LOG_DEBUG("invalid mac:%s", mac_buf);
             continue;
         }
         client_node_t *node = find_client_node(mac_buf);
@@ -706,7 +707,7 @@ void update_client_from_kernel(void)
         else
         {
             node->up_rate = 0;
-            LOG_DEBUG("update_client_from_kernel: up_rate = 0\n");
+            LOG_DEBUG("update_client_from_kernel: up_rate = 0");
         }
         if (parsed >= 6)
         {
@@ -832,7 +833,7 @@ void update_client_visiting_info(void){
     FILE *fp = fopen("/proc/net/af_visit", "r");    
     if (!fp)
     {
-        printf("open af_visit file....failed\n");
+        LOG_DEBUG("open af_visit file failed");
         return;
     }
     fgets(line_buf, sizeof(line_buf), fp); // title
@@ -1378,7 +1379,7 @@ void add_online_offline_record(client_node_t *client, int type, u_int32_t timest
     
     online_offline_record_t *record = (online_offline_record_t *)calloc(1, sizeof(online_offline_record_t));
     if (!record) {
-        LOG_ERROR("Failed to allocate memory for online_offline_record\n");
+        LOG_ERROR("Failed to allocate memory for online_offline_record");
         return;
     }
     
@@ -1575,7 +1576,7 @@ void check_and_archive_all_clients(void) {
     time_t now = time(NULL);
     struct tm *tm_info = localtime(&now);
     if (!tm_info){
-        LOG_ERROR("Failed to get local time\n");
+        LOG_ERROR("Failed to get local time");
         return;
     }
     
@@ -1666,7 +1667,7 @@ void check_and_archive_all_clients(void) {
     if (g_daily_stat_date != today) {
         memset(g_daily_type_stats, 0, sizeof(g_daily_type_stats));
         g_daily_stat_date = today;
-        LOG_DEBUG("Reset global daily type stats for new day\n");
+        LOG_DEBUG("Reset global daily type stats for new day");
     }
     
     
@@ -1678,7 +1679,7 @@ void check_and_archive_all_clients(void) {
     if (g_global_traffic_date != today) {
         memset(g_global_hourly_traffic, 0, sizeof(g_global_hourly_traffic));
         g_global_traffic_date = today;
-        LOG_DEBUG("Reset global traffic stats for new day\n");
+        LOG_DEBUG("Reset global traffic stats for new day");
     }
     
     
@@ -1687,7 +1688,7 @@ void check_and_archive_all_clients(void) {
         list_del(&record->list);
         free(record);
     }
-    LOG_DEBUG("Reset global hourly type stats for new day\n");
+    LOG_DEBUG("Reset global hourly type stats for new day");
     
     LOG_DEBUG("Archive completed: processed %d clients for date %s\n", client_count, yesterday_str);
     
@@ -2141,7 +2142,7 @@ static void cleanup_old_record_files(void) {
     time_t now = time(NULL);
     struct tm *tm_info = localtime(&now);
     if (!tm_info) {
-        LOG_ERROR("Failed to get local time for cleanup\n");
+        LOG_ERROR("Failed to get local time for cleanup");
         return;
     }
     

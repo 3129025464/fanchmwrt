@@ -23,6 +23,7 @@
 #include "fwx_utils.h"
 #include "fwx_network.h"
 #include "fwx_uci.h"
+#include "fwx_common.h"
 #define MAX_INET_ADDR_LEN 32
 #define MAX_MAC_ADDR_LEN 18
 
@@ -33,12 +34,12 @@ int get_iface_status(char *ifname, iface_status_t *status){
     buf = get_interface_status_buf(ifname);
     if (!buf){
 		
-    LOG_ERROR("get interface status buf error\n");
+    LOG_ERROR("get interface status buf error");
         return -1; 
     }   
     struct json_object *resp_obj = json_tokener_parse(buf);
     if (!resp_obj) {
-        LOG_ERROR("get_iface_status: failed to parse JSON\n");
+        LOG_ERROR("get_iface_status: failed to parse JSON");
         free(buf);
         return -1;
     }
@@ -60,7 +61,7 @@ int get_iface_status(char *ifname, iface_status_t *status){
        }
     }  
 	else{
-		LOG_ERROR("parse json error\n");
+		LOG_ERROR("parse json error");
 	}
     
     if (route_array && json_object_array_length(route_array) > 0){ 
@@ -181,23 +182,23 @@ static int ensure_fwx_network_section(struct uci_context *ctx)
     }
     struct uci_package *pkg = NULL;
     if (uci_load(ctx, "fwx", &pkg) != UCI_OK) {
-        LOG_ERROR("ensure_fwx_network_section: load fwx failed\n");
+        LOG_ERROR("ensure_fwx_network_section: load fwx failed");
         return -1;
     }
     char path[64];
     snprintf(path, sizeof(path), "fwx.network=network");
     if (uci_lookup_ptr(ctx, &ptr, path, true) != UCI_OK) {
-        LOG_ERROR("ensure_fwx_network_section: lookup ptr failed\n");
+        LOG_ERROR("ensure_fwx_network_section: lookup ptr failed");
         uci_unload(ctx, pkg);
         return -1;
     }
     if (uci_set(ctx, &ptr) != UCI_OK) {
-        LOG_ERROR("ensure_fwx_network_section: set failed\n");
+        LOG_ERROR("ensure_fwx_network_section: set failed");
         if (ptr.p) uci_unload(ctx, ptr.p);
         return -1;
     }
     if (uci_save(ctx, ptr.p) != UCI_OK) {
-        LOG_ERROR("ensure_fwx_network_section: save failed\n");
+        LOG_ERROR("ensure_fwx_network_section: save failed");
         if (ptr.p) uci_unload(ctx, ptr.p);
         return -1;
     }
@@ -236,17 +237,17 @@ static void get_section_list_values(struct uci_section *s, const char *option_na
 static struct json_object *get_interface_list_by_type(const char *iftype) {
     struct json_object *data_obj = json_object_new_object();
     struct json_object *interfaces_array = json_object_new_array();
-    LOG_DEBUG("get_interface_list_by_type called\n");
+    LOG_DEBUG("get_interface_list_by_type called");
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         json_object_put(data_obj);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
     struct uci_package *pkg = NULL;
     if (uci_load(ctx, "network", &pkg) != UCI_OK) {
-        LOG_ERROR("Failed to load network package\n");
+        LOG_ERROR("Failed to load network package");
         uci_free_context(ctx);
         json_object_put(data_obj);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
@@ -274,7 +275,7 @@ static struct json_object *get_interface_list_by_type(const char *iftype) {
 
         
         if (!interface_name_matches(name_str, iftype)) {
-			LOG_DEBUG("not match \n");
+			LOG_DEBUG("not match ");
             continue;
         }
         
@@ -292,15 +293,15 @@ static struct json_object *get_interface_list_by_type(const char *iftype) {
 
         struct json_object *dns_array = json_object_new_array();
         if (!dns_array) {
-            LOG_ERROR("get_interface_list_by_type: Failed to create dns_array\n");
+            LOG_ERROR("get_interface_list_by_type: Failed to create dns_array");
             continue;
         }
         get_section_list_values(s, "dns", dns_array);
         
-        LOG_DEBUG("get_interface_list_by_type: Creating interface object\n");
+        LOG_DEBUG("get_interface_list_by_type: Creating interface object");
         struct json_object *iface_obj = json_object_new_object();
         if (!iface_obj) {
-            LOG_ERROR("get_interface_list_by_type: Failed to create iface_obj\n");
+            LOG_ERROR("get_interface_list_by_type: Failed to create iface_obj");
             json_object_put(dns_array);
             continue;
         }
@@ -315,10 +316,10 @@ static struct json_object *get_interface_list_by_type(const char *iftype) {
         
         LOG_DEBUG("get_interface_list_by_type: Added interface %s to array\n", name_str);
         json_object_array_add(interfaces_array, iface_obj);
-        LOG_DEBUG("222222222222\n");
+        LOG_DEBUG("222222222222");
     }
     
-	LOG_DEBUG("22222222\n");
+	LOG_DEBUG("22222222");
 	
 	
     uci_free_context(ctx);
@@ -331,17 +332,17 @@ static struct json_object *get_interface_list_by_type(const char *iftype) {
 
 
 struct json_object *fwx_api_get_lan_list(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_get_lan_list: called\n");
+    LOG_DEBUG("fwx_api_get_lan_list: called");
     struct json_object *result = get_interface_list_by_type("lan");
-    LOG_DEBUG("fwx_api_get_lan_list: returning result\n");
+    LOG_DEBUG("fwx_api_get_lan_list: returning result");
     return result;
 }
 
 
 struct json_object *fwx_api_get_wan_list(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_get_wan_list: called\n");
+    LOG_DEBUG("fwx_api_get_wan_list: called");
     struct json_object *result = get_interface_list_by_type("wan");
-    LOG_DEBUG("fwx_api_get_wan_list: returning result\n");
+    LOG_DEBUG("fwx_api_get_wan_list: returning result");
     return result;
 }
 
@@ -357,7 +358,7 @@ static struct json_object *add_or_mod_interface(struct json_object *req_obj, con
     struct json_object *proto_obj = json_object_object_get(req_obj, "proto");
     
     if (!name_obj || !device_obj || !proto_obj) {
-        LOG_ERROR("Missing required fields: name, device, proto\n");
+        LOG_ERROR("Missing required fields: name, device, proto");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -383,14 +384,14 @@ static struct json_object *add_or_mod_interface(struct json_object *req_obj, con
         struct json_object *ipaddr_obj = json_object_object_get(req_obj, "ipaddr");
         struct json_object *netmask_obj = json_object_object_get(req_obj, "netmask");
         if (!ipaddr_obj || !netmask_obj) {
-            LOG_ERROR("ipaddr and netmask are required for static protocol\n");
+            LOG_ERROR("ipaddr and netmask are required for static protocol");
             return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
         }
     }
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -438,7 +439,7 @@ static struct json_object *add_or_mod_interface(struct json_object *req_obj, con
         }
         
         if (uci_save(ctx, ptr.p) != UCI_OK) {
-            LOG_ERROR("Failed to save network package\n");
+            LOG_ERROR("Failed to save network package");
             if (ptr.p) uci_unload(ctx, ptr.p);
             uci_free_context(ctx);
             return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
@@ -528,25 +529,25 @@ static struct json_object *add_or_mod_interface(struct json_object *req_obj, con
 
 
 struct json_object *fwx_api_add_lan(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_add_lan called\n");
+    LOG_DEBUG("fwx_api_add_lan called");
     return add_or_mod_interface(req_obj, "lan", 1);
 }
 
 
 struct json_object *fwx_api_mod_lan(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_mod_lan called\n");
+    LOG_DEBUG("fwx_api_mod_lan called");
     return add_or_mod_interface(req_obj, "lan", 0);
 }
 
 
 struct json_object *fwx_api_add_wan(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_add_wan called\n");
+    LOG_DEBUG("fwx_api_add_wan called");
     return add_or_mod_interface(req_obj, "wan", 1);
 }
 
 
 struct json_object *fwx_api_mod_wan(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_mod_wan called\n");
+    LOG_DEBUG("fwx_api_mod_wan called");
     return add_or_mod_interface(req_obj, "wan", 0);
 }
 
@@ -558,7 +559,7 @@ static struct json_object *del_interface(struct json_object *req_obj, const char
     
     struct json_object *name_obj = json_object_object_get(req_obj, "name");
     if (!name_obj) {
-        LOG_ERROR("Missing required field: name\n");
+        LOG_ERROR("Missing required field: name");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -572,7 +573,7 @@ static struct json_object *del_interface(struct json_object *req_obj, const char
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -599,19 +600,19 @@ static struct json_object *del_interface(struct json_object *req_obj, const char
 
 
 struct json_object *fwx_api_del_lan(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_del_lan called\n");
+    LOG_DEBUG("fwx_api_del_lan called");
     return del_interface(req_obj, "lan");
 }
 
 
 struct json_object *fwx_api_del_wan(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_del_wan called\n");
+    LOG_DEBUG("fwx_api_del_wan called");
     return del_interface(req_obj, "wan");
 }
 
 
 struct json_object *fwx_api_get_lan_info(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_get_lan_info called\n");
+    LOG_DEBUG("fwx_api_get_lan_info called");
     
     struct json_object *data_obj = json_object_new_object();
     if (!data_obj) {
@@ -620,7 +621,7 @@ struct json_object *fwx_api_get_lan_info(struct json_object *req_obj) {
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         json_object_put(data_obj);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
@@ -666,7 +667,7 @@ struct json_object *fwx_api_get_lan_info(struct json_object *req_obj) {
 
 
 struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_set_lan_info called22\n");
+    LOG_DEBUG("fwx_api_set_lan_info called22");
     
     if (!req_obj) {
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
@@ -675,7 +676,7 @@ struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -684,7 +685,7 @@ struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
     if (fwx_uci_get_value(ctx, "network.lan.proto", test_buf, sizeof(test_buf)) != 0) {
 
         if (fwx_uci_set_value(ctx, "network.lan", "interface") != 0) {
-            LOG_ERROR("Failed to create lan section\n");
+            LOG_ERROR("Failed to create lan section");
             uci_free_context(ctx);
             return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
         }
@@ -702,7 +703,7 @@ struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
     if (proto_obj) {
         const char *proto = json_object_get_string(proto_obj);
         if (proto && strcmp(proto, "pppoe") == 0) {
-            LOG_ERROR("LAN interface does not support PPPoE protocol\n");
+            LOG_ERROR("LAN interface does not support PPPoE protocol");
             uci_free_context(ctx);
             return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
         }
@@ -737,7 +738,7 @@ struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
             if (dns1 && strlen(dns1) > 0) {
                 ptr.value = (char *)dns1;
                 if (uci_add_list(ctx, &ptr) != UCI_OK) {
-                    LOG_ERROR("Failed to add DNS1 to list\n");
+                    LOG_ERROR("Failed to add DNS1 to list");
                 }
             }
         }
@@ -747,7 +748,7 @@ struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
             if (dns2 && strlen(dns2) > 0) {
                 ptr.value = (char *)dns2;
                 if (uci_add_list(ctx, &ptr) != UCI_OK) {
-                    LOG_ERROR("Failed to add DNS2 to list\n");
+                    LOG_ERROR("Failed to add DNS2 to list");
                 }
             }
         }
@@ -762,7 +763,7 @@ struct json_object *fwx_api_set_lan_info(struct json_object *req_obj) {
 
 
 struct json_object *fwx_api_get_wan_info(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_get_wan_info called\n");
+    LOG_DEBUG("fwx_api_get_wan_info called");
     
     struct json_object *data_obj = json_object_new_object();
     if (!data_obj) {
@@ -771,7 +772,7 @@ struct json_object *fwx_api_get_wan_info(struct json_object *req_obj) {
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         json_object_put(data_obj);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
@@ -822,7 +823,7 @@ struct json_object *fwx_api_get_wan_info(struct json_object *req_obj) {
 
 
 struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
-    LOG_DEBUG("fwx_api_set_wan_info called\n");
+    LOG_DEBUG("fwx_api_set_wan_info called");
     
     if (!req_obj) {
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
@@ -830,7 +831,7 @@ struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -839,7 +840,7 @@ struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
     if (fwx_uci_get_value(ctx, "network.wan.proto", test_buf, sizeof(test_buf)) != 0) {
 
         if (fwx_uci_set_value(ctx, "network.wan", "interface") != 0) {
-            LOG_ERROR("Failed to create wan section\n");
+            LOG_ERROR("Failed to create wan section");
             uci_free_context(ctx);
             return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
         }
@@ -860,7 +861,7 @@ struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
     }
     
     if (!proto) {
-        LOG_ERROR("Protocol not specified and cannot be determined\n");
+        LOG_ERROR("Protocol not specified and cannot be determined");
         uci_free_context(ctx);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
@@ -901,7 +902,7 @@ struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
                     ptr.value = (char *)dns1;
                     
                     if (uci_add_list(ctx, &ptr) != UCI_OK) {
-                        LOG_ERROR("Failed to add DNS1 to list\n");
+                        LOG_ERROR("Failed to add DNS1 to list");
                     }
                 }
             }
@@ -913,7 +914,7 @@ struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
                     
                     ptr.value = (char *)dns2;
                     if (uci_add_list(ctx, &ptr) != UCI_OK) {
-                        LOG_ERROR("Failed to add DNS2 to list\n");
+                        LOG_ERROR("Failed to add DNS2 to list");
                     }
                 }
             }
@@ -946,23 +947,23 @@ struct json_object *fwx_api_set_wan_info(struct json_object *req_obj) {
     uci_free_context(ctx);
     
 
-    LOG_DEBUG("Reloading network configuration...\n");
+    LOG_DEBUG("Reloading network configuration...");
     int ret = system("/etc/init.d/network reload");
     if (ret != 0) {
         LOG_ERROR("Failed to reload network, return code: %d\n", ret);
     }
     
-    LOG_DEBUG("WAN interface info updated successfully\n");
+    LOG_DEBUG("WAN interface info updated successfully");
     return fwx_gen_api_response_data(API_CODE_SUCCESS, NULL);
 }
 
 
 struct json_object *fwx_api_get_work_mode(struct json_object *req_obj)
 {
-    LOG_DEBUG("fwx_api_get_work_mode called\n");
+    LOG_DEBUG("fwx_api_get_work_mode called");
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("fwx_api_get_work_mode: alloc ctx failed\n");
+        LOG_ERROR("fwx_api_get_work_mode: alloc ctx failed");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     int work_mode = fwx_uci_get_int_value(ctx, "fwx.network.work_mode");
@@ -982,13 +983,13 @@ struct json_object *fwx_api_get_work_mode(struct json_object *req_obj)
 
 struct json_object *fwx_api_set_work_mode(struct json_object *req_obj)
 {
-    LOG_DEBUG("fwx_api_set_work_mode called\n");
+    LOG_DEBUG("fwx_api_set_work_mode called");
     if (!req_obj) {
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     struct json_object *wm_obj = json_object_object_get(req_obj, "work_mode");
     if (!wm_obj) {
-        LOG_ERROR("fwx_api_set_work_mode: missing work_mode\n");
+        LOG_ERROR("fwx_api_set_work_mode: missing work_mode");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     int work_mode = json_object_get_int(wm_obj);
@@ -999,7 +1000,7 @@ struct json_object *fwx_api_set_work_mode(struct json_object *req_obj)
 
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("fwx_api_set_work_mode: alloc ctx failed\n");
+        LOG_ERROR("fwx_api_set_work_mode: alloc ctx failed");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
 
@@ -1046,7 +1047,7 @@ static void fill_lan_dhcp_info(struct json_object *data_obj)
 {
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("fill_lan_dhcp_info: alloc ctx failed\n");
+        LOG_ERROR("fill_lan_dhcp_info: alloc ctx failed");
         return;
     }
 
@@ -1091,23 +1092,23 @@ static int ensure_dhcp_lan_section(struct uci_context *ctx)
     }
     struct uci_package *pkg = NULL;
     if (uci_load(ctx, "dhcp", &pkg) != UCI_OK) {
-        LOG_ERROR("ensure_dhcp_lan_section: load dhcp failed\n");
+        LOG_ERROR("ensure_dhcp_lan_section: load dhcp failed");
         return -1;
     }
     char path[64];
     snprintf(path, sizeof(path), "dhcp.lan=dhcp");
     if (uci_lookup_ptr(ctx, &ptr, path, true) != UCI_OK) {
-        LOG_ERROR("ensure_dhcp_lan_section: lookup ptr failed\n");
+        LOG_ERROR("ensure_dhcp_lan_section: lookup ptr failed");
         uci_unload(ctx, pkg);
         return -1;
     }
     if (uci_set(ctx, &ptr) != UCI_OK) {
-        LOG_ERROR("ensure_dhcp_lan_section: set failed\n");
+        LOG_ERROR("ensure_dhcp_lan_section: set failed");
         if (ptr.p) uci_unload(ctx, ptr.p);
         return -1;
     }
     if (uci_save(ctx, ptr.p) != UCI_OK) {
-        LOG_ERROR("ensure_dhcp_lan_section: save failed\n");
+        LOG_ERROR("ensure_dhcp_lan_section: save failed");
         if (ptr.p) uci_unload(ctx, ptr.p);
         return -1;
     }
@@ -1134,7 +1135,7 @@ static int update_lan_dhcp_from_req(struct json_object *dhcp_obj)
     
     struct uci_context *ctx = uci_alloc_context();
     if (!ctx) {
-        LOG_ERROR("update_lan_dhcp_from_req: alloc ctx failed\n");
+        LOG_ERROR("update_lan_dhcp_from_req: alloc ctx failed");
         return -1;
     }
 	

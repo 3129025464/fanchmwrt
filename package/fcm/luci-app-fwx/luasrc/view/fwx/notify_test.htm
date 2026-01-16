@@ -1,0 +1,47 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-section">
+    <h4><%:Test Notifications%></h4>
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" onclick="testNotify('email')"><%:Test Email%></button>
+        <button class="cbi-button cbi-button-apply" onclick="testNotify('webhook')"><%:Test Webhook%></button>
+    </div>
+    <div id="test-result"></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Recent Notifications%></h4>
+    <div id="notify-history"><em><%:Loading...%></em></div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    
+    window.testNotify = function(type) {
+        var msgs = {email: ['<%:Sending test email...%>', '<%:Test email sent%>'], webhook: ['<%:Sending test webhook...%>', '<%:Test webhook sent%>']};
+        FWX.msg.show('test-result', msgs[type][0]);
+        FWX.api.post('notify_test', {type: type}, function(data) {
+            FWX.msg.show('test-result', data && data.success ? msgs[type][1] : (data && data.message) || '<%:Failed%>', !data || !data.success);
+        });
+    };
+    
+    function loadHistory() {
+        FWX.api.get('notify_history', function(data) {
+            if (data && data.history && data.history.length > 0) {
+                var rows = data.history.map(function(h) { return [h.time, h.type, h.status, h.detail]; });
+                FWX.table.render('notify-history', ['<%:Time%>', '<%:Type%>', '<%:Status%>', '<%:Detail%>'], rows, '<%:No notification history%>');
+            } else {
+                FWX.dom.setHtml('notify-history', '<em><%:No notification history%></em>');
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadHistory);
+})();
+</script>
+
+<%+cbi/valuefooter%>

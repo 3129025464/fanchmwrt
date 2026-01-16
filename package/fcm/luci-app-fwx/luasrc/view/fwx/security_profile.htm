@@ -1,0 +1,263 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-section">
+    <h4><%:Hardware Information%></h4>
+    <div class="av-status" id="hw-info">
+        <div class="av-status-item">
+            <div class="label"><%:Memory%></div>
+            <div class="value" id="hw-memory">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:CPU Cores%></div>
+            <div class="value" id="hw-cores">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:CPU Model%></div>
+            <div class="value" id="hw-model">-</div>
+        </div>
+    </div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Security Profile%></h4>
+    <p class="profile-hint"><%:Recommended profile based on your hardware%>: <strong id="recommended-profile">-</strong></p>
+    
+    <div class="profile-cards" id="profile-list">
+        <em><%:Loading...%></em>
+    </div>
+    
+    <div id="profile-warning" class="profile-warning" style="display:none;">
+        <strong>⚠️ <%:Warning%>:</strong> <span id="warning-text"></span>
+    </div>
+    
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" id="btn-apply" onclick="applyProfile()" disabled>
+            <%:Apply Selected Profile%>
+        </button>
+    </div>
+    <div id="apply-status"></div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    
+    var selectedLevel = -1;
+    var recommendedLevel = -1;
+    var profileData = null;
+    
+    var profileIcons = ['🛡️', '🔒', '🔐', '🛡️🔒', '🏰'];
+    var profileColors = ['#9E9E9E', '#4CAF50', '#2196F3', '#FF9800', '#F44336'];
+    
+    function loadProfile() {
+        FWX.api.get('hardware_profile', function(data) {
+            if (!data) return;
+            profileData = data;
+            
+            // 显示硬件信息
+            if (data.hardware) {
+                FWX.dom.setText('hw-memory', data.hardware.memory_total_mb + ' MB');
+                FWX.dom.setText('hw-cores', data.hardware.cpu_cores);
+                FWX.dom.setText('hw-model', data.hardware.cpu_model || '-');
+            }
+            
+            recommendedLevel = data.recommended_level || 0;
+            
+            // 显示推荐档位
+            if (data.recommended) {
+                FWX.dom.setText('recommended-profile', data.recommended.display_name);
+            }
+            
+            // 渲染档位卡片
+            renderProfiles(data.profiles || []);
+        });
+    }
+    
+    function renderProfiles(profiles) {
+        var container = document.getElementById('profile-list');
+        var html = '';
+        
+        profiles.forEach(function(p, idx) {
+            var isRecommended = (p.level === recommendedLevel);
+            var meetsReq = p.meets_requirements !== false;
+            var cardClass = 'profile-card';
+            if (isRecommended) cardClass += ' recommended';
+            if (!meetsReq) cardClass += ' disabled';
+            
+            html += '<div class="' + cardClass + '" data-level="' + p.level + '" onclick="selectProfile(' + p.level + ', ' + meetsReq + ')">';
+            html += '<div class="profile-icon" style="color:' + profileColors[idx] + '">' + profileIcons[idx] + '</div>';
+            html += '<div class="profile-name">' + p.display_name + '</div>';
+            if (isRecommended) {
+                html += '<div class="profile-badge"><%:Recommended%></div>';
+            }
+            html += '<div class="profile-desc">' + (p.description || '') + '</div>';
+            html += '<div class="profile-req"><%:Requires%>: ' + p.min_memory_mb + 'MB+ RAM';
+            if (p.min_cpu_cores > 1) html += ', ' + p.min_cpu_cores + '+ <%:cores%>';
+            html += '</div>';
+            
+            if (p.features) {
+                html += '<div class="profile-features">';
+                if (p.features.threat_intel) html += '<span class="feature-tag"><%:Threat Intel%></span>';
+                if (p.features.ids_basic) html += '<span class="feature-tag">IDS</span>';
+                if (p.features.ids_suricata === 1) html += '<span class="feature-tag">Suricata (<%:Lite%>)</span>';
+                if (p.features.ids_suricata === 2) html += '<span class="feature-tag">Suricata (<%:Full%>)</span>';
+                if (p.features.av_scan) html += '<span class="feature-tag"><%:Antivirus%></span>';
+                if (p.features.traffic_analysis) html += '<span class="feature-tag"><%:Traffic%></span>';
+                html += '</div>';
+            }
+            
+            if (!meetsReq) {
+                html += '<div class="profile-not-meet"><%:Hardware requirements not met%></div>';
+            }
+            
+            html += '</div>';
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    window.selectProfile = function(level, meetsReq) {
+        // 移除之前的选中状态
+        document.querySelectorAll('.profile-card').forEach(function(card) {
+            card.classList.remove('selected');
+        });
+        
+        // 选中当前
+        var card = document.querySelector('.profile-card[data-level="' + level + '"]');
+        if (card) {
+            card.classList.add('selected');
+        }
+        
+        selectedLevel = level;
+        document.getElementById('btn-apply').disabled = false;
+        
+        // 显示警告
+        var warning = document.getElementById('profile-warning');
+        if (!meetsReq) {
+            document.getElementById('warning-text').textContent = 
+                '<%:Selected profile exceeds your hardware capabilities. Performance may be affected.%>';
+            warning.style.display = 'block';
+        } else if (level > recommendedLevel) {
+            document.getElementById('warning-text').textContent = 
+                '<%:Selected profile is higher than recommended. Monitor system performance.%>';
+            warning.style.display = 'block';
+        } else {
+            warning.style.display = 'none';
+        }
+    };
+    
+    window.applyProfile = function() {
+        if (selectedLevel < 0) return;
+        
+        FWX.msg.show('apply-status', '<%:Applying profile...%>');
+        document.getElementById('btn-apply').disabled = true;
+        
+        FWX.api.post('apply_profile', {level: selectedLevel}, function(data) {
+            if (data && data.success) {
+                FWX.msg.show('apply-status', '<%:Profile applied successfully%>: ' + (data.profile || ''));
+            } else {
+                FWX.msg.show('apply-status', '<%:Failed to apply profile%>: ' + (data && data.message || ''), true);
+            }
+            document.getElementById('btn-apply').disabled = false;
+        });
+    };
+    
+    document.addEventListener('DOMContentLoaded', loadProfile);
+})();
+</script>
+
+<style>
+.profile-hint {
+    margin-bottom: 20px;
+    color: var(--text-color-medium);
+}
+.profile-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.profile-card {
+    background: var(--background-color-high);
+    border: 2px solid var(--border-color-low);
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.profile-card:hover {
+    border-color: var(--primary-color-high);
+    transform: translateY(-2px);
+}
+.profile-card.selected {
+    border-color: var(--primary-color-high);
+    background: rgba(var(--primary-color-rgb), 0.1);
+}
+.profile-card.recommended {
+    border-color: var(--success-color-high);
+}
+.profile-card.disabled {
+    opacity: 0.6;
+}
+.profile-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+.profile-name {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--text-color-high);
+}
+.profile-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--success-color-high);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+.profile-desc {
+    font-size: 12px;
+    color: var(--text-color-medium);
+    margin-bottom: 10px;
+}
+.profile-req {
+    font-size: 11px;
+    color: var(--text-color-low);
+    margin-bottom: 10px;
+}
+.profile-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.feature-tag {
+    background: var(--background-color-medium);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    color: var(--text-color-medium);
+}
+.profile-not-meet {
+    margin-top: 10px;
+    color: var(--error-color-high);
+    font-size: 11px;
+}
+.profile-warning {
+    background: rgba(var(--warn-color-rgb), 0.1);
+    border: 1px solid var(--warn-color-high);
+    border-radius: 6px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    color: var(--warn-color-high);
+}
+</style>
+
+<%+cbi/valuefooter%>

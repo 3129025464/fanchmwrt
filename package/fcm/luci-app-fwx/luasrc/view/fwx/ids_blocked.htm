@@ -1,0 +1,72 @@
+<%+cbi/valueheader%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-section">
+    <h4><%:Blocked IPs%></h4>
+    <div id="blocked-list"><em><%:Loading...%></em></div>
+</div>
+
+<div class="fwx-section">
+    <h4><%:Suricata Deep IDS%></h4>
+    <div class="av-status">
+        <div class="av-status-item">
+            <div class="label"><%:Status%></div>
+            <div class="value" id="suricata-status">-</div>
+        </div>
+        <div class="av-status-item">
+            <div class="label"><%:Rules%></div>
+            <div class="value" id="suricata-rules">-</div>
+        </div>
+    </div>
+    <div class="av-actions">
+        <button class="cbi-button cbi-button-apply" id="btn-suricata-toggle" onclick="toggleSuricata()"><%:Start%></button>
+        <button class="cbi-button cbi-button-action" onclick="updateSuricataRules()"><%:Update Rules%></button>
+    </div>
+    <div id="suricata-msg"></div>
+</div>
+
+<script>
+(function() {
+    FWX.init('<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/');
+    var isRunning = false;
+    
+    FWX.dom.setHtml('blocked-list', '<p><%:Use "nft list set inet fwx_ids blocked_ips" to view blocked IPs%></p>');
+    
+    function loadStatus() {
+        FWX.api.get('suricata_status', function(data) {
+            if (!data) return;
+            var btn = document.getElementById('btn-suricata-toggle');
+            
+            if (!data.installed) {
+                FWX.status.setValue('suricata-status', '<%:Not Installed%>', 'error');
+                btn.disabled = true;
+            } else {
+                isRunning = data.running;
+                FWX.status.setValue('suricata-status', isRunning ? '<%:Running%>' : '<%:Stopped%>', isRunning ? 'ok' : 'warn');
+                btn.textContent = isRunning ? '<%:Stop%>' : '<%:Start%>';
+            }
+            FWX.dom.setText('suricata-rules', data.rules_count || 0);
+        });
+    }
+    
+    window.toggleSuricata = function() {
+        FWX.api.post('suricata_control', {action: isRunning ? 'stop' : 'start'}, function(data) {
+            FWX.msg.show('suricata-msg', data && data.success ? data.message : '<%:Operation failed%>', !data || !data.success);
+            setTimeout(loadStatus, 2000);
+        });
+    };
+    
+    window.updateSuricataRules = function() {
+        FWX.msg.show('suricata-msg', '<%:Updating rules...%>');
+        FWX.api.post('suricata_control', {action: 'update-rules'}, function(data) {
+            FWX.msg.show('suricata-msg', data && data.success ? '<%:Rules update started%>' : '<%:Update failed%>', !data || !data.success);
+        });
+    };
+    
+    document.addEventListener('DOMContentLoaded', loadStatus);
+})();
+</script>
+
+<%+cbi/valuefooter%>

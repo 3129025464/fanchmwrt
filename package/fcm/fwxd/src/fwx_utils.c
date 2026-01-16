@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* 
  * Copyright(c) 2026 destan19(TT) <www.fanchmwrt.com>  
@@ -8,12 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <arpa/inet.h>
 
 #include "fwx_utils.h"
+#include "fwx_common.h"
 
 char *str_trim(char *s) {
     char *start, *last, *bk;
@@ -67,15 +64,15 @@ int check_same_network(char *ip1, char *netmask, char *ip2) {
     struct in_addr addr1, addr2, mask;
 
     if (inet_pton(AF_INET, ip1, &addr1) != 1) {
-        printf("Invalid IP address: %s\n", ip1);
+        LOG_ERROR("Invalid IP address: %s", ip1);
         return -1;
     }
     if (inet_pton(AF_INET, netmask, &mask) != 1) {
-        printf("Invalid netmask: %s\n", netmask);
+        LOG_ERROR("Invalid netmask: %s", netmask);
         return -1;
     }
     if (inet_pton(AF_INET, ip2, &addr2) != 1) {
-        printf("Invalid IP address: %s\n", ip2);
+        LOG_ERROR("Invalid IP address: %s", ip2);
         return -1;
     }
 
@@ -87,35 +84,13 @@ int check_same_network(char *ip1, char *netmask, char *ip2) {
 }
 
 
+/* 兼容旧接�?- 使用 fwx_common.h 中的统一实现 */
 int af_read_file_value(const char *file_path, char *value, int value_len) {
-    FILE *file = fopen(file_path, "r");
-    if (!file) {
-        perror("Failed to open file");
-        return -1;
-    }
-
-    if (fgets(value, value_len, file) == NULL) {
-        perror("Failed to read line from file");
-        fclose(file);
-        return -1;
-    }
-
-    size_t len = strlen(value);
-    if (len > 0 && value[len - 1] == '\n') {
-        value[len - 1] = '\0';
-    }
-
-    fclose(file);
-    return 0;
+    return fwx_read_file(file_path, value, value_len) > 0 ? 0 : -1;
 }
 
 int af_read_file_int_value(const char *file_path, int *value) {
-    char line_buf[128] = {0};
-    if (af_read_file_value(file_path, line_buf, sizeof(line_buf)) < 0){
-        return -1;
-    }
-    *value = atoi(line_buf);
-    return 0;
+    return fwx_read_file_int(file_path, value);
 }
 
 /**

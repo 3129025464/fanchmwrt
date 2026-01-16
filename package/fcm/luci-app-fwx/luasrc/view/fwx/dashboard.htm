@@ -1,0 +1,112 @@
+<%+header%>
+
+<link rel="stylesheet" href="<%=resource%>/fwx/fwx-security.css">
+<script src="<%=resource%>/fwx/fwx-security.js"></script>
+
+<div class="fwx-dashboard">
+    <h1><%:FanchMWRT Security Center%></h1>
+    
+    <div class="fwx-status">
+        <div class="fwx-status-item">
+            <span class="fwx-status-dot" id="status-fwxd"></span>
+            <span>FWX Daemon</span>
+        </div>
+        <div class="fwx-status-item">
+            <span class="fwx-status-dot" id="status-threat"></span>
+            <span><%:Threat Intel%></span>
+        </div>
+        <div class="fwx-status-item">
+            <span class="fwx-status-dot" id="status-ids"></span>
+            <span>IDS/IPS</span>
+        </div>
+        <div class="fwx-status-item">
+            <span class="fwx-status-dot" id="status-suricata"></span>
+            <span>Suricata</span>
+        </div>
+    </div>
+    
+    <div class="fwx-cards">
+        <div class="fwx-card info">
+            <h3><%:Threat IPs%></h3>
+            <div class="value" id="stat-threat-ips">-</div>
+        </div>
+        <div class="fwx-card info">
+            <h3><%:Threat Domains%></h3>
+            <div class="value" id="stat-threat-domains">-</div>
+        </div>
+        <div class="fwx-card warning">
+            <h3><%:IDS Blocked%></h3>
+            <div class="value" id="stat-ids-blocked">-</div>
+        </div>
+        <div class="fwx-card danger">
+            <h3><%:Alerts Today%></h3>
+            <div class="value" id="stat-alerts-today">-</div>
+        </div>
+    </div>
+    
+    <div class="fwx-section">
+        <h2><%:Quick Actions%></h2>
+        <button class="fwx-btn fwx-btn-primary" onclick="updateThreat()"><%:Update Threat Intel%></button>
+    </div>
+    
+    <div class="fwx-section">
+        <h2><%:Recent Alerts%></h2>
+        <div id="alerts-list"><em><%:Loading...%></em></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var apiBase = '<%=luci.dispatcher.build_url("admin/fwx_security/api")%>/';
+    FWX.init(apiBase);
+    
+    function loadStatus() {
+        FWX.api.get('status', function(data) {
+            if (!data) return;
+            FWX.status.setDot('status-fwxd', data.fwxd);
+            FWX.status.setDot('status-threat', data.threat);
+            FWX.status.setDot('status-ids', data.ids);
+            FWX.status.setDot('status-suricata', data.suricata);
+        });
+    }
+    
+    function loadStats() {
+        FWX.api.get('stats', function(data) {
+            if (!data) return;
+            FWX.dom.setText('stat-threat-ips', FWX.format.number(data.threat_ips || 0));
+            FWX.dom.setText('stat-threat-domains', FWX.format.number(data.threat_domains || 0));
+            FWX.dom.setText('stat-ids-blocked', data.ids_blocked || 0);
+            FWX.dom.setText('stat-alerts-today', data.alerts_today || 0);
+        });
+    }
+    
+    function loadAlerts() {
+        FWX.api.get('alerts', function(data) {
+            var container = document.getElementById('alerts-list');
+            if (data && data.alerts && data.alerts.length > 0) {
+                container.innerHTML = data.alerts.slice(0, 20).map(function(a) {
+                    return '<div class="alert-line">' + FWX.format.escape(a) + '</div>';
+                }).join('');
+            } else {
+                container.innerHTML = '<em><%:No alerts%></em>';
+            }
+        });
+    }
+    
+    window.updateThreat = function() {
+        FWX.api.post('threat_update', null, function(data) {
+            if (data && data.success) {
+                alert('<%:Threat intelligence update started%>');
+            }
+        });
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        FWX.refresh.start('status', loadStatus, 10000);
+        FWX.refresh.start('stats', loadStats, 30000);
+        FWX.refresh.start('alerts', loadAlerts, 15000);
+    });
+})();
+</script>
+
+<%+footer%>

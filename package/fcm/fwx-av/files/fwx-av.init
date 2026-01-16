@@ -1,0 +1,66 @@
+#!/bin/sh /etc/rc.common
+# FWX Antivirus Service
+
+START=96
+STOP=09
+USE_PROCD=1
+
+start_service() {
+    . /lib/functions.sh
+    config_load fwx_av
+    
+    local enable auto_update update_interval
+    config_get enable global enable "0"
+    config_get auto_update global auto_update "1"
+    config_get update_interval global update_interval "24"
+    
+    [ "$enable" = "1" ] || return 0
+    
+    # Create directories
+    mkdir -p /etc/fwx/av/quarantine
+    mkdir -p /tmp/log
+    
+    # Setup auto-update cron
+    if [ "$auto_update" = "1" ]; then
+        local cron_file="/etc/crontabs/root"
+        grep -q "fwx-av update" "$cron_file" 2>/dev/null || {
+            echo "0 */$update_interval * * * /usr/bin/fwx-av update" >> "$cron_file"
+        }
+    fi
+    
+    # Setup scheduled scan
+    local sched_enable scan_time
+    config_get sched_enable schedule enable "0"
+    config_get scan_time schedule scan_time "03:00"
+    
+    if [ "$sched_enable" = "1" ]; then
+        local hour=$(echo "$scan_time" | cut -d: -f1)
+        local min=$(echo "$scan_time" | cut -d: -f2)
+        local cron_file="/etc/crontabs/root"
+        grep -q "fwx-av-scan" "$cron_file" 2>/dev/null || {
+            echo "$min $hour * * * /usr/bin/fwx-av-scan" >> "$cron_file"
+        }
+    fi
+    
+    /etc/init.d/cron reload 2>/dev/null
+    
+    # Start realtime monitoring
+    /usr/bin/fwx-av start-realtime
+}
+
+stop_service() {
+    /usr/bin/fwx-av stop-realtime
+    
+    # Remove cron jobs
+    sed -i '/fwx-av/d' /etc/crontabs/root 2>/dev/null
+    /etc/init.d/cron reload 2>/dev/null
+}
+
+reload_service() {
+    stop_service
+    start_service
+}
+
+service_triggers() {
+    procd_add_reload_trigger "fwx_av"
+}

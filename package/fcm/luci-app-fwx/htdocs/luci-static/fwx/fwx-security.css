@@ -1,0 +1,358 @@
+/**
+ * FanchMWRT Security Center Styles
+ * Uses theme CSS variables for consistency
+ */
+
+/* ===== Base Components ===== */
+
+/* Container */
+.fwx-dashboard,
+.alerts-container {
+    padding: 20px;
+}
+
+/* Card Grid */
+.fwx-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Card */
+.fwx-card {
+    background: var(--background-color-high);
+    border: 1px solid var(--border-color-low);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.fwx-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: var(--text-color-medium);
+}
+
+.fwx-card .value {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--text-color-high);
+}
+
+/* Card color variants */
+.fwx-card.success .value { color: var(--success-color-high); }
+.fwx-card.warning .value { color: var(--warn-color-high); }
+.fwx-card.danger .value { color: var(--error-color-high); }
+.fwx-card.info .value { color: var(--primary-color-high); }
+
+/* ===== Status Components ===== */
+
+/* Status row */
+.fwx-status,
+.av-status,
+.suricata-status {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+/* Status item - shared base */
+.fwx-status-item,
+.av-status-item,
+.suricata-status-item {
+    padding: 10px 15px;
+    background: var(--background-color-high);
+    border: 1px solid var(--border-color-low);
+    border-radius: 6px;
+}
+
+.fwx-status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Status dot */
+.fwx-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.fwx-status-dot.running { background: var(--success-color-high); }
+.fwx-status-dot.stopped { background: var(--error-color-high); }
+
+/* Status item labels and values */
+.av-status-item .label,
+.suricata-status-item .label {
+    font-size: 12px;
+    color: var(--text-color-medium);
+}
+
+.av-status-item .value,
+.suricata-status-item .value {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Value color states */
+.av-status-item .value.ok,
+.suricata-status-item .value.ok { color: var(--success-color-high); }
+.av-status-item .value.warn,
+.suricata-status-item .value.warn { color: var(--warn-color-high); }
+.av-status-item .value.error,
+.suricata-status-item .value.error { color: var(--error-color-high); }
+
+/* ===== Section Components ===== */
+
+/* Section container */
+.fwx-section,
+.av-section,
+.suricata-section {
+    background: var(--background-color-high);
+    border: 1px solid var(--border-color-low);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.av-section,
+.suricata-section {
+    background: var(--background-color-medium);
+    margin: 20px 0;
+    padding: 15px;
+}
+
+.fwx-section h2 {
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    border-bottom: 1px solid var(--border-color-medium);
+    padding-bottom: 10px;
+    color: var(--text-color-high);
+}
+
+.av-section h4,
+.suricata-section h4 {
+    margin: 0 0 15px 0;
+    color: var(--text-color-high);
+}
+
+/* ===== Button Components ===== */
+
+.fwx-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: opacity 0.2s ease;
+}
+
+.fwx-btn:hover { opacity: 0.9; }
+
+.fwx-btn-primary {
+    background: var(--primary-color-high);
+    color: var(--on-primary-color);
+}
+
+.fwx-btn-danger {
+    background: var(--error-color-high);
+    color: var(--on-error-color);
+}
+
+/* Action button groups */
+.av-actions,
+.suricata-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+/* ===== Form Components ===== */
+
+.av-scan-input {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.av-scan-input input,
+.filter-group select {
+    padding: 8px;
+    border: 1px solid var(--border-color-medium);
+    border-radius: 4px;
+    background: var(--background-color-high);
+    color: var(--text-color-high);
+}
+
+.av-scan-input input {
+    flex: 1;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ===== Table Components ===== */
+
+.alerts-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--background-color-high);
+    border: 1px solid var(--border-color-low);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.alerts-table th,
+.alerts-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color-medium);
+}
+
+.alerts-table th {
+    background: var(--background-color-medium);
+    font-weight: 600;
+    color: var(--text-color-high);
+}
+
+.alerts-table tr:hover {
+    background: var(--background-color-low);
+}
+
+/* ===== Alert Level Badges ===== */
+
+.alert-level {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.alert-level.info { 
+    background: rgba(25, 118, 210, 0.1);
+    color: var(--primary-color-high);
+}
+
+.alert-level.warning { 
+    background: rgba(239, 189, 11, 0.1);
+    color: var(--warn-color-high);
+}
+
+.alert-level.critical { 
+    background: rgba(var(--error-color-high-rgb), 0.1);
+    color: var(--error-color-high);
+}
+
+.alert-level.emergency { 
+    background: var(--error-color-high);
+    color: var(--on-error-color);
+}
+
+/* ===== Log Display ===== */
+
+#alerts-list {
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 12px;
+    background: var(--background-color-low);
+    color: var(--text-color-high);
+    padding: 10px;
+    border: 1px solid var(--border-color-medium);
+    border-radius: 4px;
+}
+
+#alerts-list .alert-line {
+    padding: 2px 0;
+    border-bottom: 1px solid var(--border-color-low);
+}
+
+#alerts-list .alert-line:last-child {
+    border-bottom: none;
+}
+
+/* ===== Toolbar ===== */
+
+.alerts-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ===== Utility Classes ===== */
+
+.text-center { text-align: center; }
+
+/* ===== Protocol Distribution Bars ===== */
+
+.protocol-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.protocol-bar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.protocol-name {
+    width: 60px;
+    font-weight: 500;
+    color: var(--text-color-high);
+}
+
+.protocol-bar-bg {
+    flex: 1;
+    height: 20px;
+    background: var(--background-color-low);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.protocol-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.protocol-pct {
+    width: 50px;
+    text-align: right;
+    color: var(--text-color-medium);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+    .fwx-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .fwx-status,
+    .av-status,
+    .suricata-status {
+        flex-direction: column;
+    }
+    
+    .alerts-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .av-scan-input {
+        flex-direction: column;
+    }
+}

@@ -21,8 +21,8 @@
 #include "fwx.h"
 #include <stdio.h>
 #include <json-c/json.h>
-
 #include "fwx_utils.h"
+#include "fwx_common.h"
 
 
 #define APPFILTER_RULES_STATE_FILE "/tmp/appfilter_rules_state"
@@ -30,14 +30,7 @@
 
 
 static void set_state_file(const char *file_path) {
-    FILE *fd = fopen(file_path, "w");
-    if (fd) {
-        fprintf(fd, "1");
-        fclose(fd);
-        LOG_DEBUG("Set state file: %s\n", file_path);
-    } else {
-        LOG_ERROR("Failed to set state file: %s\n", file_path);
-    }
+    fwx_write_file(file_path, "1");
 }
 
 fwx_run_time_status_t g_af_status;
@@ -47,7 +40,7 @@ void dev_list_timeout_handler(struct uloop_timeout *t);
 
 static int find_rule_index_by_id(struct uci_context *uci_ctx, int id) {
     char id_str_uci[32];
-	int i;
+    int i;
     int num = fwx_uci_get_list_num(uci_ctx, "appfilter", "rule");
     for (i = 0; i < num; i++) {
         char buf[128];
@@ -78,14 +71,14 @@ struct json_object *fwx_api_get_filter_rules(struct json_object *req_obj) {
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
 
     // Load appfilter package once
     struct uci_package *pkg = NULL;
     if (uci_load(uci_ctx, "appfilter", &pkg) != UCI_OK) {
-        LOG_ERROR("Failed to load appfilter package\n");
+        LOG_ERROR("Failed to load appfilter package");
         uci_free_context(uci_ctx);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
@@ -226,13 +219,13 @@ struct json_object *fwx_api_add_filter_rule(struct json_object *req_obj) {
     struct json_object *app_ids_obj = json_object_object_get(req_obj, "app_ids");
     int i, j;
     if (!name_obj || !mode_obj || !time_rules_obj || !app_ids_obj) {
-        LOG_ERROR("Missing required fields\n");
+        LOG_ERROR("Missing required fields");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -331,7 +324,7 @@ struct json_object *fwx_api_update_filter_rule(struct json_object *req_obj) {
     struct json_object *id_obj = json_object_object_get(req_obj, "id");
 	int i, j;
     if (!id_obj) {
-        LOG_ERROR("Missing id field\n");
+        LOG_ERROR("Missing id field");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -339,7 +332,7 @@ struct json_object *fwx_api_update_filter_rule(struct json_object *req_obj) {
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -457,7 +450,7 @@ struct json_object *fwx_api_update_filter_rule(struct json_object *req_obj) {
 struct json_object *fwx_api_delete_filter_rule(struct json_object *req_obj) {
     struct json_object *id_obj = json_object_object_get(req_obj, "id");
     if (!id_obj) {
-        LOG_ERROR("Missing id field\n");
+        LOG_ERROR("Missing id field");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -465,7 +458,7 @@ struct json_object *fwx_api_delete_filter_rule(struct json_object *req_obj) {
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -498,7 +491,7 @@ struct json_object *fwx_api_get_appfilter_whitelist(struct json_object *req_obj)
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
 
@@ -528,17 +521,17 @@ struct json_object *fwx_api_get_appfilter_whitelist(struct json_object *req_obj)
 
 struct json_object *fwx_api_del_appfilter_whitelist(struct json_object *req_obj){
 	int i;
-    LOG_DEBUG("fwx_api_del_appfilter_whitelist\n");
+    LOG_DEBUG("fwx_api_del_appfilter_whitelist");
     struct json_object *mac_obj = json_object_object_get(req_obj, "mac");
     if (!mac_obj) {
-        LOG_ERROR("mac_obj is NULL\n");
+        LOG_ERROR("mac_obj is NULL");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     LOG_DEBUG("mac: %s\n", json_object_get_string(mac_obj));
 
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     char mac_str[128] = {0};
@@ -565,16 +558,16 @@ struct json_object *fwx_api_del_appfilter_whitelist(struct json_object *req_obj)
 
 struct json_object *fwx_api_add_appfilter_whitelist(struct json_object *req_obj){
 	int i;
-    LOG_DEBUG("fwx_api_add_appfilter_whitelist\n");
+    LOG_DEBUG("fwx_api_add_appfilter_whitelist");
     struct json_object *mac_array = json_object_object_get(req_obj, "mac_list");
     if (!mac_array) {
-        LOG_ERROR("mac_list not found\n");
+        LOG_ERROR("mac_list not found");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
 
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
 
@@ -599,7 +592,7 @@ struct json_object *fwx_api_get_app_filter_adv(struct json_object *req_obj) {
     
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         json_object_put(data_obj);
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
@@ -619,13 +612,13 @@ struct json_object *fwx_api_set_app_filter_adv(struct json_object *req_obj) {
     
     struct json_object *enable_obj = json_object_object_get(req_obj, "enable");
     if (!enable_obj) {
-        LOG_ERROR("Missing enable parameter\n");
+        LOG_ERROR("Missing enable parameter");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
 
     struct uci_context *uci_ctx = uci_alloc_context();
     if (!uci_ctx) {
-        LOG_ERROR("Failed to allocate UCI context\n");
+        LOG_ERROR("Failed to allocate UCI context");
         return fwx_gen_api_response_data(API_CODE_ERROR, NULL);
     }
     
@@ -635,6 +628,6 @@ struct json_object *fwx_api_set_app_filter_adv(struct json_object *req_obj) {
 
     set_state_file(APPFILTER_RULES_STATE_FILE);
     uci_free_context(uci_ctx);
-    LOG_DEBUG("Set appfilter advanced settings\n");
+    LOG_DEBUG("Set appfilter advanced settings");
     return fwx_gen_api_response_data(API_CODE_SUCCESS, NULL);
 }
