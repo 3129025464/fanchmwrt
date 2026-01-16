@@ -68,12 +68,32 @@ fwx_validate_domain() {
     echo "$1" | grep -qE '^[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)+$'
 }
 
+# 端口验证
+fwx_validate_port() {
+    local port="$1"
+    [ -n "$port" ] && [ "$port" -ge 1 ] && [ "$port" -le 65535 ] 2>/dev/null
+}
+
+# MAC 地址验证
+fwx_validate_mac() {
+    echo "$1" | grep -qE '^([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}$'
+}
+
 # 获取 WAN 接口
 fwx_get_wan_device() {
     . /lib/functions/network.sh 2>/dev/null
     local dev
     network_get_device dev wan 2>/dev/null
     [ -z "$dev" ] && dev=$(ip route 2>/dev/null | grep default | awk '{print $5}' | head -1)
+    echo "$dev"
+}
+
+# 获取 LAN 接口
+fwx_get_lan_device() {
+    . /lib/functions/network.sh 2>/dev/null
+    local dev
+    network_get_device dev lan 2>/dev/null
+    [ -z "$dev" ] && dev="br-lan"
     echo "$dev"
 }
 
@@ -100,6 +120,20 @@ fwx_uci_get_bool() {
         0|no|false|off) echo "0" ;;
         *) echo "$default" ;;
     esac
+}
+
+fwx_uci_set() {
+    local config="$1"
+    local section="$2"
+    local option="$3"
+    local value="$4"
+    
+    uci -q set "${config}.${section}.${option}=${value}"
+}
+
+fwx_uci_commit() {
+    local config="$1"
+    uci commit "$config" 2>/dev/null
 }
 
 # 发送告警到 fwxd
@@ -135,4 +169,31 @@ fwx_ensure_dir() {
     for dir in "$@"; do
         [ -d "$dir" ] || mkdir -p "$dir"
     done
+}
+
+# 检查命令是否存在
+fwx_cmd_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# 安全执行命令（带超时）
+fwx_timeout_exec() {
+    local timeout="$1"
+    shift
+    
+    if fwx_cmd_exists timeout; then
+        timeout "$timeout" "$@"
+    else
+        "$@"
+    fi
+}
+
+# 获取系统内存（MB）
+fwx_get_mem_mb() {
+    awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo 2>/dev/null || echo "0"
+}
+
+# 获取 CPU 核心数
+fwx_get_cpu_cores() {
+    grep -c '^processor' /proc/cpuinfo 2>/dev/null || echo "1"
 }
