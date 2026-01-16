@@ -1,6 +1,14 @@
 name: Build OpenWrt
 
 on:
+  push:
+    branches:
+      - main
+      - master
+      - 'fanchmwrt-*'
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
   workflow_dispatch:
     inputs:
       target:
@@ -44,6 +52,11 @@ jobs:
     - name: Load config
       run: |
         TARGET="${{ github.event.inputs.target }}"
+        # Default to x86-64 if not specified (push trigger)
+        if [ -z "$TARGET" ]; then
+          TARGET="x86-64"
+        fi
+        echo "Building for target: $TARGET"
         if [ -f "configs/${TARGET}.config" ]; then
           cp "configs/${TARGET}.config" .config
           echo "Using config: configs/${TARGET}.config"
@@ -68,7 +81,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: openwrt-${{ github.event.inputs.target }}-bin
+        name: openwrt-bin-${{ github.event.inputs.target || 'x86-64' }}
         path: bin/targets/
 
     - name: Upload build log on failure
