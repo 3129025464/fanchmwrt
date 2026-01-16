@@ -1,0 +1,22 @@
+#!/bin/sh /etc/rc.common
+# FWX DPI init script
+
+START=95
+STOP=10
+USE_PROCD=1
+
+start_service() {
+    /usr/bin/fwx-dpi start
+}
+
+stop_service() {
+    /usr/bin/fwx-dpi stop
+}
+
+reload_service() {
+    /usr/bin/fwx-dpi restart
+}
+
+service_triggers() {
+    procd_add_reload_trigger "fwx_dpi"
+}
