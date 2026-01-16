@@ -1,0 +1,22 @@
+{
+    "fwx-admin": {
+        "description": "FWX Full Administrator",
+        "read": { "ubus": { "fwx.*": ["*"] }, "uci": ["*"] },
+        "write": { "ubus": { "fwx.*": ["*"] }, "uci": ["*"] }
+    },
+    "fwx-security": {
+        "description": "FWX Security Administrator",
+        "read": { "uci": ["fwx", "fwx_ids", "fwx_threat", "fwx_ddos"] },
+        "write": { "uci": ["fwx", "fwx_ids", "fwx_threat", "fwx_ddos"] }
+    },
+    "fwx-network": {
+        "description": "FWX Network Administrator",
+        "read": { "uci": ["network", "fwx_vlan", "fwx_vpn", "fwx_qos"] },
+        "write": { "uci": ["network", "fwx_vlan", "fwx_vpn", "fwx_qos"] }
+    },
+    "fwx-monitor": {
+        "description": "FWX Monitor (Read-Only)",
+        "read": { "uci": ["fwx*"] },
+        "write": {}
+    }
+}

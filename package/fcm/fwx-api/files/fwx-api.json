@@ -1,0 +1,7 @@
+{
+    "fwx-api": {
+        "description": "FWX REST API Access",
+        "read": { "ubus": { "fwx": ["*"], "fwx.*": ["*"] } },
+        "write": { "ubus": { "fwx": ["*"], "fwx.*": ["*"] } }
+    }
+}

@@ -1,0 +1,2 @@
+#!/bin/sh
+[ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "wan" ] && /usr/bin/fwx-qos restart

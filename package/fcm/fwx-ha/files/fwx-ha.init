@@ -1,0 +1,8 @@
+#!/bin/sh /etc/rc.common
+START=99
+STOP=10
+USE_PROCD=1
+
+start_service() { /usr/bin/fwx-ha start; }
+stop_service() { /usr/bin/fwx-ha stop; }
+service_triggers() { procd_add_reload_trigger "fwx_ha"; }

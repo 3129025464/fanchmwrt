@@ -1,0 +1,8 @@
+#!/bin/sh /etc/rc.common
+START=96
+STOP=10
+USE_PROCD=1
+
+start_service() { /usr/bin/fwx-ipsec start; }
+stop_service() { /usr/bin/fwx-ipsec stop; }
+service_triggers() { procd_add_reload_trigger "fwx_ipsec"; }

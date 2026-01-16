@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>FWX REST API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 900px; }
+        h1 { color: #333; border-bottom: 2px solid #4CAF50; }
+        h2 { color: #4CAF50; }
+        .endpoint { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        code { background: #e8e8e8; padding: 2px 6px; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>FWX REST API Documentation</h1>
+    <p>FanchMWRT Enterprise Firewall REST API v1.0</p>
+    
+    <h2>Authentication</h2>
+    <pre>curl -X POST http://router/ubus -d '{"jsonrpc":"2.0","id":1,"method":"call","params":["00000000000000000000000000000000","session","login",{"username":"root","password":"PASSWORD"}]}'</pre>
+    
+    <h2>Endpoints</h2>
+    
+    <div class="endpoint">
+        <code>fwx.status</code> - System status
+    </div>
+    
+    <div class="endpoint">
+        <code>fwx.stats</code> - Security statistics
+    </div>
+    
+    <div class="endpoint">
+        <code>fwx.alerts</code> - Recent alerts
+    </div>
+    
+    <div class="endpoint">
+        <code>fwx.ddos_ban</code> - Ban IP address
+        <br>Params: <code>{"ip": "x.x.x.x", "duration": 3600}</code>
+    </div>
+    
+    <div class="endpoint">
+        <code>fwx.ddos_unban</code> - Unban IP address
+        <br>Params: <code>{"ip": "x.x.x.x"}</code>
+    </div>
+    
+    <footer style="margin-top: 50px; color: #666;">
+        <p>FanchMWRT Enterprise Firewall &copy; 2026</p>
+    </footer>
+</body>
+</html>
