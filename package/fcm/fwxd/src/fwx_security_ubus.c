@@ -406,7 +406,8 @@ static int handle_hardware_profile(struct ubus_context *ctx, struct ubus_object 
 }
 
 /*
- * Apply security profile
+ * Get security profile recommendation (read-only, no auto-apply)
+ * Returns recommended settings for user to review and apply manually
  */
 static int handle_apply_profile(struct ubus_context *ctx, struct ubus_object *obj,
                                 struct ubus_request_data *req, const char *method,
@@ -449,61 +450,46 @@ static int handle_apply_profile(struct ubus_context *ctx, struct ubus_object *ob
         return 0;
     }
     
-    /* 应用配置 */
-    char cmd[512];
+    /* 只返回推荐配置，不自动执行 */
+    struct json_object *resp = json_object_new_object();
+    struct json_object *settings = json_object_new_object();
     
-    /* 威胁情报 */
-    snprintf(cmd, sizeof(cmd), "uci set threat_intel.global.enable=%d && uci commit threat_intel",
-             profile->features.threat_intel);
-    system(cmd);
+    json_object_object_add(resp, "code", json_object_new_int(0));
+    json_object_object_add(resp, "profile", json_object_new_string(profile->name));
+    json_object_object_add(resp, "description", json_object_new_string(profile->description));
     
-    /* 基础IDS */
-    snprintf(cmd, sizeof(cmd), "uci set fwx_ids.global.enable=%d && uci commit fwx_ids",
-             profile->features.ids_basic);
-    system(cmd);
+    /* 推荐的 UCI 设置 */
+    json_object_object_add(settings, "threat_intel.global.enable", 
+                           json_object_new_int(profile->features.threat_intel));
+    json_object_object_add(settings, "fwx_ids.global.enable", 
+                           json_object_new_int(profile->features.ids_basic));
+    json_object_object_add(settings, "fwx_suricata.global.enable", 
+                           json_object_new_int(profile->features.ids_suricata > 0 ? 1 : 0));
+    json_object_object_add(settings, "fwx_av.global.enable", 
+                           json_object_new_int(profile->features.av_scan));
+    json_object_object_add(settings, "fwx_traffic.global.enable", 
+                           json_object_new_int(profile->features.traffic_analysis));
     
-    /* Suricata */
-    snprintf(cmd, sizeof(cmd), "uci set fwx_suricata.global.enable=%d && uci commit fwx_suricata",
-             profile->features.ids_suricata > 0 ? 1 : 0);
-    system(cmd);
-    
-    /* 根据Suricata模式调整规则 */
+    /* Suricata 性能设置 */
     if (profile->features.ids_suricata == 1) {
-        /* 精简模式：只启用关键规则 */
-        system("uci set fwx_suricata.categories.policy=0");
-        system("uci set fwx_suricata.performance.stream_memcap=16");
-        system("uci set fwx_suricata.performance.flow_memcap=16");
-        system("uci commit fwx_suricata");
+        json_object_object_add(settings, "fwx_suricata.categories.policy", json_object_new_int(0));
+        json_object_object_add(settings, "fwx_suricata.performance.stream_memcap", json_object_new_int(16));
+        json_object_object_add(settings, "fwx_suricata.performance.flow_memcap", json_object_new_int(16));
     } else if (profile->features.ids_suricata == 2) {
-        /* 完整模式 */
-        system("uci set fwx_suricata.categories.policy=1");
-        system("uci set fwx_suricata.performance.stream_memcap=64");
-        system("uci set fwx_suricata.performance.flow_memcap=64");
-        system("uci commit fwx_suricata");
+        json_object_object_add(settings, "fwx_suricata.categories.policy", json_object_new_int(1));
+        json_object_object_add(settings, "fwx_suricata.performance.stream_memcap", json_object_new_int(64));
+        json_object_object_add(settings, "fwx_suricata.performance.flow_memcap", json_object_new_int(64));
     }
     
-    /* 病毒扫描 */
-    snprintf(cmd, sizeof(cmd), "uci set fwx_av.global.enable=%d && uci commit fwx_av",
-             profile->features.av_scan);
-    system(cmd);
+    json_object_object_add(resp, "recommended_settings", settings);
+    json_object_object_add(resp, "note", json_object_new_string("Settings are recommendations only. Apply via LuCI or UCI manually."));
     
-    /* 流量分析 */
-    snprintf(cmd, sizeof(cmd), "uci set fwx_traffic.global.enable=%d && uci commit fwx_traffic",
-             profile->features.traffic_analysis);
-    system(cmd);
-    
-    /* 保存当前档位 */
-    snprintf(cmd, sizeof(cmd), "uci set fwx.security.profile=%s && uci commit fwx",
-             profile->name);
-    system(cmd);
-    
-    LOG_INFO("Applied security profile: %s", profile->name);
+    LOG_INFO("Profile recommendation requested: %s", profile->name);
     
     blob_buf_init(&b, 0);
-    blobmsg_add_u32(&b, "code", 0);
-    blobmsg_add_string(&b, "message", "profile applied");
-    blobmsg_add_string(&b, "profile", profile->name);
+    blobmsg_add_object(&b, resp);
     ubus_send_reply(ctx, req, b.head);
+    json_object_put(resp);
     
     return 0;
 }
@@ -520,7 +506,7 @@ static const struct ubus_method fwx_security_methods[] = {
     UBUS_METHOD("av_scan", handle_av_scan, NULL),
     UBUS_METHOD_NOARG("av_status", handle_av_status),
     UBUS_METHOD_NOARG("hardware_profile", handle_hardware_profile),
-    UBUS_METHOD("apply_profile", handle_apply_profile, NULL),
+    UBUS_METHOD("get_profile", handle_apply_profile, NULL),
 };
 
 static struct ubus_object_type fwx_security_object_type =
