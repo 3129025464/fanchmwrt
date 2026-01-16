@@ -103,12 +103,31 @@ fwx_uci_get_bool() {
 }
 
 # 发送告警到 fwxd
+# 用法: fwx_alert <module> <level> <type> <src> <detail> [dst]
+# module: fwx-ids, fwx-threat, fwx-av, fwx-ddos, etc.
+# level: info, warning, critical, emergency
+# type: threat_ip, threat_domain, portscan, synflood, bruteforce, malware, ids, system
 fwx_alert() {
+    local module="$1"
+    local level="$2"
+    local type="$3"
+    local src="$4"
+    local detail="$5"
+    local dst="${6:-}"
+    
+    local json="{\"module\":\"$module\",\"level\":\"$level\",\"type\":\"$type\",\"src\":\"$src\",\"detail\":\"$detail\""
+    [ -n "$dst" ] && json="$json,\"dst\":\"$dst\""
+    json="$json}"
+    
+    ubus call fwx alert "$json" 2>/dev/null
+}
+
+# 简化版告警（向后兼容）
+fwx_alert_simple() {
     local type="$1"
     local src="$2"
     local detail="$3"
-    
-    ubus call fwx alert "{\"type\":\"$type\",\"src\":\"$src\",\"detail\":\"$detail\"}" 2>/dev/null
+    fwx_alert "unknown" "warning" "$type" "$src" "$detail"
 }
 
 # 确保目录存在

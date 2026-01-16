@@ -98,7 +98,7 @@ stop_ddos() {
 }
 
 ban_ip() {
-    local ip="$1" duration="${2:-3600}"
+    local ip="$1" duration="${2:-3600}" reason="${3:-manual}"
     
     # Validate IP
     echo "$ip" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' || {
@@ -108,8 +108,13 @@ ban_ip() {
     
     if nft list table inet $NFT_TABLE >/dev/null 2>&1; then
         nft add element inet $NFT_TABLE banned "{ $ip timeout ${duration}s }" 2>/dev/null
-        log "Banned $ip for ${duration}s"
+        log "Banned $ip for ${duration}s (reason: $reason)"
         echo "Banned: $ip for ${duration}s"
+        
+        # Send alert
+        if type fwx_alert >/dev/null 2>&1; then
+            fwx_alert "fwx-ddos" "warning" "synflood" "$ip" "IP banned for ${duration}s: $reason"
+        fi
     else
         echo "DDoS protection not running"
         return 1

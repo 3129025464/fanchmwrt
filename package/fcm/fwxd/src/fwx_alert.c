@@ -22,25 +22,25 @@ static int alert_count = 0;
 static int alert_count_by_type[16] = {0};
 
 /* 告警去重配置 */
-#define DEDUP_WINDOW_SEC    60      /* 去重时间窗口�?0�?*/
-#define DEDUP_HASH_SIZE     256     /* 哈希表大�?*/
-#define MAX_DEDUP_ENTRIES   1024    /* 最大去重条�?*/
+#define DEDUP_WINDOW_SEC    60      /* 去重时间窗口�?0�?*/
+#define DEDUP_HASH_SIZE     256     /* 哈希表大�?*/
+#define MAX_DEDUP_ENTRIES   1024    /* 最大去重条�?*/
 
 /* 去重条目 */
 typedef struct dedup_entry {
-    char key[128];              /* 去重�? src_ip + type */
+    char key[128];              /* 去重�? src_ip + type */
     time_t first_seen;          /* 首次出现时间 */
-    time_t last_seen;           /* 最后出现时�?*/
+    time_t last_seen;           /* 最后出现时�?*/
     int count;                  /* 重复次数 */
-    alert_level_t max_level;    /* 最高告警级�?*/
-    struct dedup_entry *next;   /* 链表下一�?*/
+    alert_level_t max_level;    /* 最高告警级�?*/
+    struct dedup_entry *next;   /* 链表下一�?*/
 } dedup_entry_t;
 
-/* 去重哈希�?*/
+/* 去重哈希�?*/
 static dedup_entry_t *dedup_table[DEDUP_HASH_SIZE] = {0};
 static int dedup_entry_count = 0;
 
-/* 简单哈希函�?*/
+/* 简单哈希函�?*/
 static unsigned int hash_key(const char *key)
 {
     unsigned int hash = 5381;
@@ -51,7 +51,7 @@ static unsigned int hash_key(const char *key)
     return hash % DEDUP_HASH_SIZE;
 }
 
-/* 生成去重�?*/
+/* 生成去重�?*/
 static void make_dedup_key(char *key, size_t len, const char *src_ip, alert_type_t type)
 {
     snprintf(key, len, "%s:%d", src_ip, type);
@@ -70,7 +70,7 @@ static dedup_entry_t *find_dedup_entry(const char *key, unsigned int hash)
     return NULL;
 }
 
-/* 清理过期的去重条�?*/
+/* 清理过期的去重条�?*/
 static void cleanup_dedup_entries(time_t now)
 {
     for (int i = 0; i < DEDUP_HASH_SIZE; i++) {
@@ -88,7 +88,7 @@ static void cleanup_dedup_entries(time_t now)
     }
 }
 
-/* 检查是否重复告警，返回: 0=新告�? 1=重复(已更新计�?, 2=聚合告警(需要发送汇�? */
+/* 检查是否重复告警，返回: 0=新告�? 1=重复(已更新计�?, 2=聚合告警(需要发送汇�? */
 static int check_dedup(fwx_alert_t *alert, int *dup_count)
 {
     char key[128];
@@ -106,7 +106,7 @@ static int check_dedup(fwx_alert_t *alert, int *dup_count)
     dedup_entry_t *entry = find_dedup_entry(key, hash);
     
     if (entry) {
-        /* 检查是否在时间窗口�?*/
+        /* 检查是否在时间窗口�?*/
         if (now - entry->first_seen <= DEDUP_WINDOW_SEC) {
             entry->count++;
             entry->last_seen = now;
@@ -115,23 +115,23 @@ static int check_dedup(fwx_alert_t *alert, int *dup_count)
             }
             *dup_count = entry->count;
             
-            /* �?0次重复发送一次聚合告�?*/
+            /* �?0次重复发送一次聚合告�?*/
             if (entry->count % 10 == 0) {
-                return 2;  /* 发送聚合告�?*/
+                return 2;  /* 发送聚合告�?*/
             }
-            return 1;  /* 重复，静�?*/
+            return 1;  /* 重复，静�?*/
         } else {
-            /* 时间窗口已过，重�?*/
+            /* 时间窗口已过，重�?*/
             entry->first_seen = now;
             entry->last_seen = now;
             entry->count = 1;
             entry->max_level = alert->level;
             *dup_count = 1;
-            return 0;  /* 新告�?*/
+            return 0;  /* 新告�?*/
         }
     }
     
-    /* 新条�?*/
+    /* 新条�?*/
     if (dedup_entry_count >= MAX_DEDUP_ENTRIES) {
         cleanup_dedup_entries(now);
     }
@@ -152,7 +152,7 @@ static int check_dedup(fwx_alert_t *alert, int *dup_count)
     dedup_entry_count++;
     
     *dup_count = 1;
-    return 0;  /* 新告�?*/
+    return 0;  /* 新告�?*/
 }
 
 static const char *alert_type_str[] = {
@@ -184,7 +184,7 @@ void fwx_alert_cleanup(void)
 {
     pthread_mutex_lock(&alert_mutex);
     
-    /* 释放去重�?*/
+    /* 释放去重�?*/
     for (int i = 0; i < DEDUP_HASH_SIZE; i++) {
         dedup_entry_t *entry = dedup_table[i];
         while (entry) {
@@ -230,9 +230,11 @@ int fwx_alert_log(fwx_alert_t *alert)
     tm_info = localtime(&alert->timestamp);
     strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", tm_info);
     
-    fprintf(fp, "[%s] [%s] [%s] src=%s:%d dst=%s:%d %s\n",
+    /* 日志格式: [time] [level] [module] [type] src=... dst=... detail */
+    fprintf(fp, "[%s] [%s] [%s] [%s] src=%s:%d dst=%s:%d %s\n",
             time_str,
             alert_level_str[alert->level],
+            alert->module[0] ? alert->module : "unknown",
             alert_type_str[alert->type],
             alert->src_ip,
             alert->src_port,
@@ -260,12 +262,12 @@ int fwx_alert_send(fwx_alert_t *alert)
     
     pthread_mutex_lock(&alert_mutex);
     
-    /* 去重检�?*/
+    /* 去重检�?*/
     int dup_count = 0;
     int dedup_result = check_dedup(alert, &dup_count);
     
     if (dedup_result == 1) {
-        /* 重复告警，静默处理，只更新计�?*/
+        /* 重复告警，静默处理，只更新计�?*/
         pthread_mutex_unlock(&alert_mutex);
         LOG_DEBUG("Suppressed duplicate alert: %s from %s (count: %d)",
                   alert_type_str[alert->type], alert->src_ip, dup_count);
@@ -282,23 +284,25 @@ int fwx_alert_send(fwx_alert_t *alert)
     
     pthread_mutex_unlock(&alert_mutex);
     
-    /* 记录到日�?*/
+    /* 记录到日�?*/
     fwx_alert_log(alert);
     
-    /* 记录到系统日�?*/
-    LOG_WARN("Security Alert: type=%s level=%s src=%s detail=%s",
+    /* 记录到系统日志 */
+    LOG_WARN("Security Alert: module=%s type=%s level=%s src=%s detail=%s",
+             alert->module[0] ? alert->module : "unknown",
              alert_type_str[alert->type],
              alert_level_str[alert->level],
              alert->src_ip,
              alert->detail);
     
-    /* 触发通知（如果配置了�?*/
+    /* 触发通知（如果配置了） */
     if (dedup_result == 0 || dedup_result == 2) {
         /* 只有新告警或聚合告警才发送通知 */
         char cmd[512];
         snprintf(cmd, sizeof(cmd), 
-                 "/usr/bin/fwx-notify send %s %s %s %s \"%s\" &",
+                 "/usr/bin/fwx-notify send %s %s %s %s %s \"%s\" &",
                  alert_level_str[alert->level],
+                 alert->module[0] ? alert->module : "unknown",
                  alert_type_str[alert->type],
                  alert->src_ip,
                  alert->dst_ip[0] ? alert->dst_ip : "-",

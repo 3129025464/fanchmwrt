@@ -32,6 +32,7 @@ typedef enum {
 typedef struct fwx_alert {
     alert_type_t type;
     alert_level_t level;
+    char module[32];        /* 源模块: fwx-ids, fwx-threat, fwx-av, fwx-ddos, etc. */
     char src_ip[64];
     char dst_ip[64];
     int src_port;

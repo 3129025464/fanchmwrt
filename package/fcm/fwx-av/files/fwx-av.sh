@@ -29,7 +29,11 @@ alert() {
     log "ALERT: $type - File: $file, Threat: $virus"
     
     # Send to fwxd via ubus
-    ubus call fwx alert "{\"type\":\"malware\",\"detail\":\"$virus in $file\"}" 2>/dev/null
+    if type fwx_alert >/dev/null 2>&1; then
+        fwx_alert "fwx-av" "critical" "malware" "$file" "$virus in $file"
+    else
+        ubus call fwx alert "{\"module\":\"fwx-av\",\"level\":\"critical\",\"type\":\"malware\",\"src\":\"$file\",\"detail\":\"$virus in $file\"}" 2>/dev/null
+    fi
     
     # Check email notification
     config_load fwx_av

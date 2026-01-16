@@ -23,9 +23,9 @@ alert() {
     local type="$1" src="$2" detail="$3"
     log "warn" "ALERT: $type from $src - $detail"
     if type fwx_alert >/dev/null 2>&1; then
-        fwx_alert "$type" "$src" "$detail"
+        fwx_alert "fwx-ids" "warning" "$type" "$src" "$detail"
     else
-        ubus call fwx alert "{\"type\":\"$type\",\"src\":\"$src\",\"detail\":\"$detail\"}" 2>/dev/null
+        ubus call fwx alert "{\"module\":\"fwx-ids\",\"level\":\"warning\",\"type\":\"$type\",\"src\":\"$src\",\"detail\":\"$detail\"}" 2>/dev/null
     fi
 }
 

@@ -91,6 +91,12 @@ static int handle_alert(struct ubus_context *ctx, struct ubus_object *obj,
         strncpy(alert.detail, json_object_get_string(detail_obj), sizeof(alert.detail) - 1);
     }
     
+    // Parse module (source module name)
+    struct json_object *module_obj = json_object_object_get(req_obj, "module");
+    if (module_obj) {
+        strncpy(alert.module, json_object_get_string(module_obj), sizeof(alert.module) - 1);
+    }
+    
     // Send alert
     fwx_alert_send(&alert);
     
