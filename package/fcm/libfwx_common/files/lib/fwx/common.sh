@@ -7,6 +7,7 @@ fwx_log() {
     local tag="$1"
     local level="$2"
     local msg="$3"
+    mkdir -p /tmp/log
     echo "$(date '+%Y-%m-%d %H:%M:%S') [$level] $msg" >> "/tmp/log/${tag}.log"
     logger -t "$tag" -p "daemon.$level" "$msg"
 }
